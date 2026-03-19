@@ -3,7 +3,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db = "integragames";
+$db = "integragames2";
 
 $conn = new mysqli($host,$user,$pass,$db);
 
