@@ -1,3 +1,6 @@
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- BRAND -->
@@ -12,21 +15,14 @@
 
     <!-- INICIO -->
     <li class="nav-item active">
-        <a class="nav-link" href="../menu/panel.php">
+        <a class="nav-link" href="../menu/menuLateral.php">
             <i class="fas fa-home"></i>
             <span>Inicio</span>
         </a>
     </li>
 
-    <!-- PARTICIPANTES -->
-    <li class="nav-item">
-        <a class="nav-link" href="../registroAlumnos/lista.php">
-            <i class="fas fa-user-graduate"></i>
-            <span>Participantes</span>
-        </a>
-    </li>
 
-    <?php if ($rol == "admin") { ?>
+    <?php if ($rol == "administrador") { ?>
 
         <hr class="sidebar-divider">
 
@@ -34,6 +30,14 @@
         <div class="sidebar-heading">
             Administración
         </div>
+
+        <!-- PARTICIPANTES -->
+        <li class="nav-item">
+            <a class="nav-link" href="../cruds/personal.php">
+                <i class="fas fa-user"></i>
+                <span>Personal</span>
+            </a>
+        </li>
 
         <li class="nav-item">
             <a class="nav-link" href="../eventos/">
@@ -52,7 +56,7 @@
         <li class="nav-item">
             <a class="nav-link" href="../resultados/">
                 <i class="fas fa-trophy"></i>
-                <span>Resultados</span>
+                <span>Historial</span>
             </a>
         </li>
 
@@ -87,21 +91,21 @@
     </div>
 
     <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="https://www.facebook.com/share/1CTdx2LSvG/">
             <i class="fab fa-facebook"></i>
             <span>Facebook</span>
         </a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="https://www.instagram.com/utmmorelia?igsh=NzBsNHVlYTRyeTZk">
             <i class="fab fa-instagram"></i>
             <span>Instagram</span>
         </a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="https://www.tiktok.com/@utmorelia?_r=1&_t=ZS-94h24oJcmpk">
             <i class="fab fa-tiktok"></i>
             <span>TikTok</span>
         </a>
@@ -115,7 +119,7 @@
     </div>
 
     <li class="nav-item">
-        <a class="nav-link" href="../RegistroAdmin/logout.php">
+        <a class="nav-link" href="../index.php">
             <i class="fas fa-sign-out-alt"></i>
             <span>Salir</span>
         </a>

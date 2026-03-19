@@ -53,6 +53,23 @@ html {
     -webkit-tap-highlight-color: transparent
 }
 
+
+.img-uniforme {
+    width: 100%;
+    height: 200px;        /* tamaño fijo */
+    object-fit: cover;    /* recorta sin deformar */
+}
+
+.img-listado {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card {
+    overflow: hidden;     /* evita que sobresalga */
+}
+
 article,
 aside,
 figcaption,

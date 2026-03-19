@@ -15,9 +15,14 @@ $rol = $_SESSION['rol'];
 
 <head>
     <?php include("php/encabezado.php"); ?>
+    <!-- ICONO -->
+    <link rel="icon" href="../img/control.png" type="image/png">
+
+    <!-- CSS -->
+    <link href="../css/styles.css" rel="stylesheet">
 </head>
 
-<body id="page-top">
+<body id="page-top" class="sidebar-toggled">
 
     <div id="wrapper">
 
@@ -41,7 +46,7 @@ $rol = $_SESSION['rol'];
                                 <div class="card-body text-center">
                                     <h4 class="font-weight-bold">IntegraGames</h4>
                                     <p class="mb-0">
-                                        Plataforma interactiva para la gestión de juegos educativos.
+                                        Es una plataforma interactiva para la promocion de la carrera de Tecnoloía de la informacion, con contenido educativo y entretenido, para los amantes de los videojuegos.
                                     </p>
                                 </div>
                             </div>
@@ -54,19 +59,19 @@ $rol = $_SESSION['rol'];
                         <?php
                         $juegos = [
                             [
-                                "nombre" => "Juego 1",
+                                "nombre" => "Tecologia de la informacion",
                                 "imagen" => "../img/utm2.png",
-                                "descripcion" => "Descripción del 1"
+                                "descripcion" => "Es una carrera muy interesante, con muchas oportunidades laborales"
                             ],
                             [
-                                "nombre" => "Juego 2",
-                                "imagen" => "../img/imagen2.jpeg",
-                                "descripcion" => "Descripción del 2"
-                            ],
-                            [
-                                "nombre" => "Juego 3",
+                                "nombre" => "Por que estudiar en la UTM",
                                 "imagen" => "../img/imagen3.jpeg",
-                                "descripcion" => "Descripción del 3"
+                                "descripcion" => "La UTM ofrece una educacion de calidad, con profesores altamente capacitados y una amplia variendad de conocimientes"
+                            ],
+                            [
+                                "nombre" => "Te gustan los videojuegos?",
+                                "imagen" => "../img/imagen3.jpeg",
+                                "descripcion" => "Si te gustan los videojuegos, la carrera de TI es para ti, ya que podras aprender a crear y programar tus propios juegos  "
                             ],
                             [
                                 "nombre" => "Día de San Valentín",
@@ -81,9 +86,12 @@ $rol = $_SESSION['rol'];
                             <div class="col-lg-3 col-md-6 mb-4">
                                 <div class="card shadow h-100">
 
-                                    <img src="<?php echo $juego['imagen']; ?>" class="card-img-top">
+                                    <!-- Imagen -->
+                                    <img src="<?php echo $juego['imagen']; ?>"
+                                        class="card-img-top img-uniforme">
 
-                                    <div class="card-body">
+                                    <!-- Contenido -->
+                                    <div class="card-body d-flex flex-column">
                                         <h6 class="font-weight-bold"><?php echo $juego['nombre']; ?></h6>
                                         <p class="text-muted small">
                                             <?php echo $juego['descripcion']; ?>
@@ -104,7 +112,30 @@ $rol = $_SESSION['rol'];
                             <h4 class="mb-4">Juegos</h4>
                         </div>
 
-                        <?php for ($i = 1; $i <= 3; $i++) { ?>
+                        <?php
+                        $juegos = [
+                            [
+                                "nombre" => "Error 404",
+                                "imagen" => "../img/uno/uno.png",
+                                "descripcion" => "Error 404 es un juego donde los jugadores tendran que ganar una partida de cartas.",
+                                "link" => "../juegos/error404.php"
+                            ],
+                            [
+                                "nombre" => "Code Run",
+                                "imagen" => "../img/codeRun/runCode.png",
+                                "descripcion" => "Code Run es un juego donde tendras que pasar cada nivel sin que seas derivado por las carpetas enemigas .",
+                                "link" => "../juegos/codeRun.php"
+                            ],
+                            [
+                                "nombre" => "Juego 3",
+                                "imagen" => "../img/juego3.jpg",
+                                "descripcion" => "Descripción del juego 3, reglas básicas.",
+                                "link" => "../juegos/juego3.php"
+                            ]
+                        ];
+
+                        foreach ($juegos as $juego) {
+                        ?>
 
                             <div class="col-12 mb-4">
                                 <div class="card shadow">
@@ -114,20 +145,22 @@ $rol = $_SESSION['rol'];
 
                                             <!-- Imagen -->
                                             <div class="col-md-4">
-                                                <img src="https://via.placeholder.com/400x250" class="img-fluid rounded">
+                                                <img src="<?php echo $juego['imagen']; ?>"
+                                                    class="img-fluid rounded img-uniforme">
                                             </div>
 
                                             <!-- Info -->
                                             <div class="col-md-6">
-                                                <h5>Nombre del juego</h5>
+                                                <h5><?php echo $juego['nombre']; ?></h5>
                                                 <p class="text-muted">
-                                                    Descripción más completa del juego, objetivos, etc.
+                                                    <?php echo $juego['descripcion']; ?>
                                                 </p>
                                             </div>
 
                                             <!-- Botón -->
                                             <div class="col-md-2 text-center">
-                                                <a href="#" class="btn btn-primary btn-sm">
+                                                <a href="<?php echo $juego['link']; ?>"
+                                                    class="btn btn-primary btn-sm">
                                                     Ver más
                                                 </a>
                                             </div>
@@ -165,6 +198,15 @@ $rol = $_SESSION['rol'];
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="../js/sb-admin-2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.getElementById("sidebarToggle").addEventListener("click", function() {
+            document.body.classList.toggle("sidebar-toggled");
+            document.querySelector(".sidebar").classList.toggle("toggled");
+        });
+    </script>
 
 </body>
 
