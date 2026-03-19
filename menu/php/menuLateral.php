@@ -22,44 +22,56 @@
     </li>
 
 
-    <?php if ($rol == "administrador") { ?>
+    <?php
+    $esAdmin = ($rol == "administrador");
+    $esProgramador = ($rol == "programador");
+    $esPromotor = ($rol == "promotor");
+    ?>
 
-        <hr class="sidebar-divider">
+    <hr class="sidebar-divider">
 
-        <!-- ADMIN -->
-        <div class="sidebar-heading">
-            Administración
-        </div>
+    <div class="sidebar-heading">
+        Administración
+    </div>
 
-        <!-- PARTICIPANTES -->
+    <!-- PERSONAL (solo admin) -->
+    <?php if ($esAdmin) { ?>
         <li class="nav-item">
             <a class="nav-link" href="../cruds/personal.php">
                 <i class="fas fa-user"></i>
                 <span>Personal</span>
             </a>
         </li>
+    <?php } ?>
 
+    <!-- EVENTOS (admin, programador, promotor) -->
+    <?php if ($esAdmin || $esProgramador || $esPromotor) { ?>
         <li class="nav-item">
             <a class="nav-link" href="../eventos/">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Eventos</span>
             </a>
         </li>
+    <?php } ?>
 
+    <!-- ESCUELAS (admin y programador) -->
+    <?php if ($esAdmin || $esProgramador) { ?>
         <li class="nav-item">
             <a class="nav-link" href="../escuelas/">
                 <i class="fas fa-school"></i>
                 <span>Escuelas</span>
             </a>
         </li>
+    <?php } ?>
 
+    <!-- HISTORIAL (admin y programador) -->
+    <?php if ($esAdmin || $esProgramador) { ?>
         <li class="nav-item">
             <a class="nav-link" href="../cruds/lista.php">
                 <i class="fas fa-trophy"></i>
                 <span>Historial</span>
             </a>
         </li>
-
     <?php } ?>
 
     <hr class="sidebar-divider">
