@@ -15,7 +15,7 @@
 
     <!-- INICIO -->
     <li class="nav-item active">
-        <a class="nav-link" href="../menu/menuLateral.php">
+        <a class="nav-link" href="../menu/menu.php">
             <i class="fas fa-home"></i>
             <span>Inicio</span>
         </a>
@@ -54,7 +54,7 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="../resultados/">
+            <a class="nav-link" href="../cruds/lista.php">
                 <i class="fas fa-trophy"></i>
                 <span>Historial</span>
             </a>

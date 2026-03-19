@@ -3,8 +3,8 @@
 session_start();
 require_once "../config/conexion.php";
 
-$correo = $_POST['correo'];
-$password = $_POST['password'];
+$correo = trim($_POST['correo']);
+$password = trim($_POST['password']);
 
 $sql = "SELECT * FROM responsable 
         WHERE correo='$correo' 
