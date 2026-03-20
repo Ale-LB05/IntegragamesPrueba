@@ -81,8 +81,9 @@
                 </span>
 
                 <!-- FOTO -->
-                <img class="img-profile rounded-circle"
-                    src="../img/undraw_profile.svg">
+                <div style="width:50px; height:50px; border-radius:50%; background:#eaeaea; display:flex; align-items:center; justify-content:center; margin-right:15px;">
+                    <i class="fas fa-user"></i>
+                </div>
             </a>
 
             <!-- DROPDOWN -->

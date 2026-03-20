@@ -47,7 +47,7 @@
     <!-- EVENTOS (admin, programador, promotor) -->
     <?php if ($esAdmin || $esProgramador || $esPromotor) { ?>
         <li class="nav-item">
-            <a class="nav-link" href="../eventos/">
+            <a class="nav-link" href="../cruds/eventos.php">
                 <i class="fas fa-calendar-alt"></i>
                 <span>Eventos</span>
             </a>
@@ -67,10 +67,25 @@
     <!-- HISTORIAL (admin y programador) -->
     <?php if ($esAdmin || $esProgramador) { ?>
         <li class="nav-item">
-            <a class="nav-link" href="../cruds/lista.php">
-                <i class="fas fa-trophy"></i>
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsuarios"
+                aria-expanded="false" aria-controls="collapseUsuarios">
+                <i class="fas fa-users"></i>
                 <span>Historial</span>
             </a>
+
+            <div id="collapseUsuarios" class="collapse" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <h6 class="collapse-header">Historial:</h6>
+
+                    <a class="collapse-item" href="../cruds/encargadoEvento.php">
+                        <i class="fas fa-user-tie"></i> Eventos
+                    </a>
+
+                    <a class="collapse-item" href="../cruds/lista.php">
+                        <i class="fas fa-users"></i> Participantes
+                    </a>
+                </div>
+            </div>
         </li>
     <?php } ?>
 

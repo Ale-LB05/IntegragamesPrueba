@@ -78,7 +78,7 @@ if (isset($_POST['eliminar'])) {
 
                     <!-- TÍTULO -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 text-gray-800">Panel de información</h1>
+                        <h1 class="h3 text-gray-800">Panel de personal</h1>
                     </div>
 
                     <!-- CARD PRINCIPAL -->
@@ -106,8 +106,9 @@ if (isset($_POST['eliminar'])) {
                                             <!-- IZQUIERDA -->
                                             <div class="d-flex align-items-center">
 
-                                                <div class="img-user mr-3">
-                                                    <img src="../img/user.png">
+                                                <!-- ICONO -->
+                                                <div style="width:50px; height:50px; border-radius:50%; background:#eaeaea; display:flex; align-items:center; justify-content:center; margin-right:15px;">
+                                                    <i class="fas fa-user"></i>
                                                 </div>
 
                                                 <div>

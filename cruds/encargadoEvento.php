@@ -12,20 +12,19 @@ $rol = $_SESSION['rol'];
 
 /* CONSULTA */
 $sql = "SELECT 
-p.nombre,
-p.edad,
+e.id_evento,
 e.nombre_evento,
-esc.nombre_escuela,
-r.tipo_juego,
-r.puntaje,
-r.fecha,
-s.calificacion,
-s.comentario
-FROM participante p
-LEFT JOIN evento e ON p.id_evento = e.id_evento
-LEFT JOIN escuela esc ON p.id_escuela = esc.id_escuela
-LEFT JOIN resultado r ON p.id_participante = r.id_participante
-LEFT JOIN satisfaccion s ON p.id_participante = s.id_participante";
+e.lugar,
+e.fecha,
+GROUP_CONCAT(DISTINCT r.nombre SEPARATOR ', ') AS nombre_responsable,
+COUNT(DISTINCT p.id_participante) AS total_personas
+FROM evento e
+LEFT JOIN evento_responsable er ON e.id_evento = er.id_evento
+LEFT JOIN responsable r ON er.id_responsable = r.id_responsable
+LEFT JOIN participante p ON e.id_evento = p.id_evento
+GROUP BY e.id_evento";
+
+$res = $conn->query($sql);
 
 $res = $conn->query($sql);
 ?>
@@ -35,7 +34,7 @@ $res = $conn->query($sql);
 
 <head>
     <meta charset="UTF-8">
-    <title>Participantes</title>
+    <title>Eventos Registrados</title>
 
     <?php include("../menu/php/encabezado.php"); ?>
     <link rel="icon" href="../img/control.png" type="image/png">
@@ -100,7 +99,7 @@ $res = $conn->query($sql);
                 <!-- CONTENIDO PRINCIPAL -->
                 <div class="container-fluid mt-4">
 
-                    <h2>Registros Completos</h2>
+                    <h2>Eventos Registrados</h2>
 
                     <div class="card p-3">
 
@@ -121,15 +120,11 @@ $res = $conn->query($sql);
 
                                 <thead>
                                     <tr>
-                                        <th>Nombre</th>
-                                        <th>Edad</th>
                                         <th>Evento</th>
-                                        <th>Escuela</th>
-                                        <th>Juego</th>
-                                        <th>Puntaje</th>
+                                        <th>Lugar</th>
                                         <th>Fecha</th>
-                                        <th>Calificación</th>
-                                        <th>Comentario</th>
+                                        <th>Responsable</th>
+                                        <th>Total Personas</th>
                                     </tr>
                                 </thead>
 
@@ -137,39 +132,21 @@ $res = $conn->query($sql);
 
                                     <?php if ($res->num_rows == 0) { ?>
                                         <tr>
-                                            <td colspan="9">No hay registros</td>
+                                            <td colspan="4">No hay registros</td>
                                         </tr>
                                     <?php } ?>
 
                                     <?php while ($row = $res->fetch_assoc()) { ?>
                                         <tr>
-                                            <td><?= $row['nombre'] ?></td>
-                                            <td><?= $row['edad'] ?></td>
-                                            <td><?= $row['nombre_evento'] ?? '-' ?></td>
-                                            <td><?= $row['nombre_escuela'] ?? '-' ?></td>
-                                            <td><?= $row['tipo_juego'] ?? '-' ?></td>
-                                            <td><?= $row['puntaje'] ?? '-' ?></td>
+                                            <td><?= $row['nombre_evento'] ?></td>
+                                            <td><?= $row['lugar'] ?></td>
 
                                             <td>
                                                 <?= $row['fecha'] ? date("d/m/Y", strtotime($row['fecha'])) : '-' ?>
                                             </td>
 
-                                            <td>
-                                                <?php
-                                                $cal = $row['calificacion'];
-                                                if ($cal >= 8) {
-                                                    echo "<span class='badge badge-success'>$cal</span>";
-                                                } elseif ($cal >= 5) {
-                                                    echo "<span class='badge badge-warning'>$cal</span>";
-                                                } elseif ($cal !== null) {
-                                                    echo "<span class='badge badge-danger'>$cal</span>";
-                                                } else {
-                                                    echo "-";
-                                                }
-                                                ?>
-                                            </td>
-
-                                            <td><?= $row['comentario'] ?? '-' ?></td>
+                                            <td><?= $row['nombre_responsable'] ?? 'Sin asignar' ?></td>
+                                            <td><?= $row['total_personas'] ?></td>
                                         </tr>
                                     <?php } ?>
 
@@ -196,8 +173,21 @@ $res = $conn->query($sql);
             let filas = document.querySelectorAll("tbody tr");
 
             filas.forEach(fila => {
-                let texto = fila.textContent.toLowerCase();
-                fila.style.display = texto.includes(filtro) ? "" : "none";
+                let evento = fila.children[0].textContent.toLowerCase();
+                let lugar = fila.children[1].textContent.toLowerCase();
+                let fecha = fila.children[2].textContent.toLowerCase();
+                let responsable = fila.children[3].textContent.toLowerCase();
+
+                if (
+                    evento.includes(filtro) ||
+                    lugar.includes(filtro) ||
+                    fecha.includes(filtro) ||
+                    responsable.includes(filtro)
+                ) {
+                    fila.style.display = "";
+                } else {
+                    fila.style.display = "none";
+                }
             });
         });
 

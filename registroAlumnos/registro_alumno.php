@@ -8,6 +8,8 @@ $eventos = $conn->query("SELECT * FROM evento");
 <html lang="es">
 
 <head>
+    <!-- ICONO -->
+    <link rel="icon" href="../img/control.png" type="image/png">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Registro Alumno - IntegraGames</title>
