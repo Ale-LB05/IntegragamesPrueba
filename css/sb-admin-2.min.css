@@ -40,10 +40,42 @@
     --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace
 }
 
-*,
-::after,
-::before {
-    box-sizing: border-box
+/* Sidebar normal */
+.sidebar {
+    width: 14rem;
+    transition: all 0.3s;
+}
+
+/* Sidebar minimizado */
+.sidebar.toggled {
+    width: 6.5rem;
+}
+
+/* OCULTAR TEXTO */
+.sidebar.toggled .nav-link span,
+.sidebar.toggled .sidebar-brand-text,
+.sidebar.toggled .sidebar-heading {
+    display: none !important;
+}
+
+/* CENTRAR ICONOS */
+.sidebar.toggled .nav-item .nav-link {
+    text-align: center;
+    padding: 0.75rem 1rem;
+}
+
+/* ICONOS MÁS GRANDES */
+.sidebar .nav-link i {
+    font-size: 1rem;
+}
+
+.sidebar.toggled .nav-link i {
+    font-size: 1.3rem;
+}
+
+/* SUBMENÚ oculto cuando está minimizado */
+.sidebar.toggled .collapse-inner {
+    display: none;
 }
 
 html {
@@ -56,8 +88,10 @@ html {
 
 .img-uniforme {
     width: 100%;
-    height: 200px;        /* tamaño fijo */
-    object-fit: cover;    /* recorta sin deformar */
+    height: 200px;
+    /* tamaño fijo */
+    object-fit: cover;
+    /* recorta sin deformar */
 }
 
 .img-listado {
@@ -67,7 +101,8 @@ html {
 }
 
 .card {
-    overflow: hidden;     /* evita que sobresalga */
+    overflow: hidden;
+    /* evita que sobresalga */
 }
 
 article,
