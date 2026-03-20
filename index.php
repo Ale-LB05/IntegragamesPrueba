@@ -217,7 +217,7 @@
             <div class="logo-icon">
                 <i class="fa-solid fa-gamepad"></i>
             </div>
-            <h1 class="main-title">IntegraGames</h1>
+            <h1 class="main-title">Integra</h1>
             <p class="subtitle">La integración de la carrera a través del juego</p>
         </div>
 
