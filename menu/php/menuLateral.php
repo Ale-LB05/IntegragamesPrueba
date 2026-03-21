@@ -43,7 +43,7 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="../escuelas/">
+            <a class="nav-link" href="../registroEscuela/escuelas.php">
                 <i class="fas fa-school"></i>
                 <span>Escuelas</span>
             </a>
