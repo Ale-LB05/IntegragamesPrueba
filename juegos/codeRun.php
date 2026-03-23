@@ -45,10 +45,8 @@ $rol = $_SESSION['rol'];
                             "../img/codeRun/runCode.4.png"
                         ],
                         "descripcion" => [
-                            "Run Code es un juego de estrategia.",
-                            "debes de hasegurarte de que pasar los njivles sin morir.",
-                            "al pasar los niveles se encontraran con enemigos ostiles que inteteran hacerte añicos.",
-                            "y deberas vencer al enemigo mas temido de un programador 'La terminal'."
+                            "El proyecto consiste en un videojuego de plataformas 2D desarrollado en Godot, en el cual el jugador controla un personaje que interactúa con distintos elementos del entorno, recolecta objetos y avanza a través de niveles.
+                                Esta versión incluye las bases del sistema jugable, como movimiento, interacción con objetos y control de la partida."
                         ],
                         "link" => "juego1.php"
                     ];
@@ -101,7 +99,7 @@ $rol = $_SESSION['rol'];
 
                                 <!-- BOTÓN -->
                                 <div class="text-center">
-                                    <a href="<?php echo $juego['link']; ?>" class="btn btn-primary px-5">
+                                    <a href="../juegos/Code&Run/index.html" class="btn btn-primary px-5">
                                         Jugar
                                     </a>
                                 </div>

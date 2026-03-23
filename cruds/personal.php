@@ -15,29 +15,52 @@ if (!isset($_SESSION['usuario'])) {
 
 /* CREAR */
 if (isset($_POST['crear'])) {
+
     $nombre = $_POST['nombre'];
     $correo = $_POST['correo'];
     $contraseña = $_POST['contrasena'];
     $rol = $_POST['rol'];
 
-    $sql = "INSERT INTO responsable(nombre, correo, contraseña, rol)
-            VALUES('$nombre','$correo','$contraseña','$rol')";
+    // IMAGEN POR DEFECTO
+    $imagenNombre = "sinFoto.jpg";
+
+    $sql = "INSERT INTO responsable(nombre, correo, contraseña, rol, imagen)
+            VALUES('$nombre','$correo','$contraseña','$rol','$imagenNombre')";
     $conn->query($sql);
 }
 
 /* EDITAR */
 if (isset($_POST['editar'])) {
+
     $id = $_POST['id'];
     $nombre = $_POST['nombre'];
     $correo = $_POST['correo'];
     $contraseña = $_POST['contrasena'];
     $rol = $_POST['rol'];
 
+    // OBTENER IMAGEN ACTUAL
+    $sqlImg = $conn->query("SELECT imagen FROM responsable WHERE id_responsable='$id'");
+    $imagenNombre = "";
+
+    if ($sqlImg && $sqlImg->num_rows > 0) {
+        $fila = $sqlImg->fetch_assoc();
+        $imagenNombre = $fila['imagen'];
+    }
+
+    // NUEVA IMAGEN
+    if (!empty($_FILES['imagen']['name'])) {
+        $imagenNombre = time() . "_" . $_FILES['imagen']['name'];
+        $ruta = "../img/responsables/" . $imagenNombre;
+
+        move_uploaded_file($_FILES['imagen']['tmp_name'], $ruta);
+    }
+
     $sql = "UPDATE responsable 
             SET nombre='$nombre', 
                 correo='$correo', 
                 contraseña='$contraseña', 
-                rol='$rol'
+                rol='$rol',
+                imagen='$imagenNombre'
             WHERE id_responsable='$id'";
     $conn->query($sql);
 }
@@ -106,10 +129,15 @@ if (isset($_POST['eliminar'])) {
                                             <!-- IZQUIERDA -->
                                             <div class="d-flex align-items-center">
 
-                                                <!-- ICONO -->
-                                                <div style="width:50px; height:50px; border-radius:50%; background:#eaeaea; display:flex; align-items:center; justify-content:center; margin-right:15px;">
-                                                    <i class="fas fa-user"></i>
-                                                </div>
+                                                <!-- IMAGEN -->
+                                                <?php
+                                                $imagen = (!empty($row['imagen']) && file_exists("../img/responsables/" . $row['imagen']))
+                                                    ? "../img/responsables/" . $row['imagen']
+                                                    : "../img/responsables/sinFoto.jpg";
+                                                ?>
+
+                                                <img src="<?= $imagen ?>"
+                                                    style="width:60px; height:60px; object-fit:cover; border-radius:50%; margin-right:15px;">
 
                                                 <div>
                                                     <h6 class="mb-1"><?= $row["nombre"] ?></h6>
@@ -125,19 +153,20 @@ if (isset($_POST['eliminar'])) {
                                             <!-- BOTONES -->
                                             <div>
 
-                                                <!-- EDITAR -->
+                                                <!-- EDITAR 
                                                 <button class="btn btn-info btn-sm"
                                                     data-toggle="modal"
                                                     data-target="#modalEditar"
                                                     onclick="editarRegistro(
-                                                    '<?= $row['id_responsable'] ?>',
-                                                    '<?= $row['nombre'] ?>',
-                                                    '<?= $row['correo'] ?>',
-                                                    '<?= htmlspecialchars($row['contraseña'], ENT_QUOTES) ?>',
-                                                    '<?= $row['rol'] ?>'
-                                                )">
+                                                        '<?= $row['id_responsable'] ?>',
+                                                        '<?= $row['nombre'] ?>',
+                                                        '<?= $row['correo'] ?>',
+                                                        '<?= htmlspecialchars($row['contraseña'], ENT_QUOTES) ?>',
+                                                        '<?= $row['rol'] ?>',
+                                                        '<?= $imagen ?>'
+                                                        )">
                                                     <i class="fas fa-edit"></i>
-                                                </button>
+                                                </button> -->
 
                                                 <!-- ELIMINAR -->
                                                 <button class="btn btn-danger btn-sm"
@@ -173,7 +202,7 @@ if (isset($_POST['eliminar'])) {
     <!-- CREAR -->
     <div class="modal fade" id="modalCrear">
         <div class="modal-dialog">
-            <form method="POST" class="modal-content">
+            <form method="POST" enctype="multipart/form-data" class="modal-content">
 
                 <div class="modal-header">
                     <h5>Nuevo responsable</h5>
@@ -212,7 +241,7 @@ if (isset($_POST['eliminar'])) {
     <!-- EDITAR -->
     <div class="modal fade" id="modalEditar">
         <div class="modal-dialog">
-            <form method="POST" class="modal-content">
+            <form method="POST" enctype="multipart/form-data" class="modal-content">
 
                 <div class="modal-header bg-info text-white">
                     <h5>Editar</h5>
@@ -222,6 +251,13 @@ if (isset($_POST['eliminar'])) {
                 <div class="modal-body">
 
                     <input type="hidden" name="id" id="editId">
+                    <div class="text-center mb-2">
+                        <img id="previewImagen"
+                            src=""
+                            style="width:70px; height:70px; object-fit:cover; border-radius:50%;">
+                    </div>
+
+                    <input type="file" name="imagen" class="form-control">
 
                     <input type="text" name="nombre" id="editNombre" class="form-control mb-2">
                     <input type="email" name="correo" id="editCorreo" class="form-control mb-2">
@@ -283,12 +319,15 @@ if (isset($_POST['eliminar'])) {
     <script src="../js/sb-admin-2.min.js"></script>
 
     <script>
-        function editarRegistro(id, nombre, correo, contrasena, rol) {
+        function editarRegistro(id, nombre, correo, contrasena, rol, imagen) {
+
             document.getElementById('editId').value = id;
             document.getElementById('editNombre').value = nombre;
             document.getElementById('editCorreo').value = correo;
             document.getElementById('editContrasena').value = contrasena;
             document.getElementById('editRol').value = rol;
+
+            document.getElementById('previewImagen').src = imagen;
         }
 
         function borraRegistro(id, nombre) {
