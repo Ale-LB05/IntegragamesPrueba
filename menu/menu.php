@@ -35,6 +35,7 @@ $rol = $_SESSION['rol'];
 
                 <!-- BARRA SUPERIOR -->
                 <?php include("php/barraSuperior.php"); ?>
+               
 
                 <!-- CONTENIDO -->
                 <div class="container-fluid">
