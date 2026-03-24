@@ -50,7 +50,7 @@ $res = $conn->query("SELECT * FROM escuela");
 <head>
     <?php include("../menu/php/encabezado.php"); ?>
 
-    <link rel="icon" href="../img/control.png">
+    <link rel="icon" href="../img/logo.png">
     <link href="../css/styles.css" rel="stylesheet">
 
     <style>

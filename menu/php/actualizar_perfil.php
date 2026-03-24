@@ -2,68 +2,77 @@
 session_start();
 require_once "../../config/conexion.php";
 
+/* VALIDAR SESIÓN */
 if (!isset($_SESSION['usuario'])) {
     header("Location: ../../RegistroAdmin/login.php");
     exit();
 }
 
-$usuarioActual = $_SESSION['usuario'];
-
-$nuevoNombre = $_POST['nombre'];
-$correo = $_POST['correo'];
-$password = $_POST['password'];
-$actual = $_POST['actual'];
-
-// Obtener contraseña actual de BD
-$sqlUser = "SELECT `contraseña` FROM responsable WHERE nombre='$usuarioActual'";
-$res = mysqli_query($conn, $sqlUser);
-$user = mysqli_fetch_assoc($res);
-
-$passBD = $user['contraseña'];
-
-//  VALIDACIÓN INTELIGENTE (soporta texto plano y encriptado)
-$esValida = false;
-
-if (password_verify($actual, $passBD)) {
-    $esValida = true; // ya está encriptada
-} elseif ($actual === $passBD) {
-    $esValida = true; // texto plano
-}
-
-//  Si quiere cambiar contraseña pero no coincide
-if (!empty($password) && !$esValida) {
-    echo "<script>
-        alert(' Contraseña actual incorrecta');
-        window.history.back();
-    </script>";
+/* VALIDAR MÉTODO */
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: ../perfil.php");
     exit();
 }
 
-//  SI CAMBIA CONTRASEÑA
-if (!empty($password)) {
+$usuarioActual = $_SESSION['usuario'];
 
-    //  Guardar contraseña en texto plano (SIN HASH)
-    $sql = "UPDATE responsable 
-            SET nombre='$nuevoNombre', correo='$correo', `contraseña`='$password'
-            WHERE nombre='$usuarioActual'";
+/* OBTENER USUARIO */
+$sqlUser = "SELECT * FROM responsable WHERE nombre='$usuarioActual'";
+$res = mysqli_query($conn, $sqlUser);
+$user = mysqli_fetch_assoc($res);
 
-} else {
-
-    // Solo actualiza datos
-    $sql = "UPDATE responsable 
-            SET nombre='$nuevoNombre', correo='$correo'
-            WHERE nombre='$usuarioActual'";
+if (!$user) {
+    die("Usuario no encontrado");
 }
 
-// Ejecutar
+/* CONSERVAR DATOS */
+$nuevoNombre = !empty($_POST['nombre']) ? $_POST['nombre'] : $user['nombre'];
+$correo = !empty($_POST['correo']) ? $_POST['correo'] : $user['correo'];
+$passwordNueva = !empty($_POST['password']) ? $_POST['password'] : null;
+$actual = $_POST['actual'] ?? '';
+$imagenNombre = $user['imagen'];
+
+/* VALIDAR CONTRASEÑA */
+if (!empty($passwordNueva)) {
+    if (!(password_verify($actual, $user['contraseña']) || $actual === $user['contraseña'])) {
+        echo "<script>
+            alert('Contraseña incorrecta');
+            window.history.back();
+        </script>";
+        exit();
+    }
+}
+
+/* SUBIR IMAGEN */
+if (!empty($_FILES['imagen']['name'])) {
+
+    $nombreArchivo = time() . "_" . basename($_FILES['imagen']['name']);
+    $ruta = "../../img/responsables/" . $nombreArchivo;
+
+    if (move_uploaded_file($_FILES['imagen']['tmp_name'], $ruta)) {
+        $imagenNombre = $nombreArchivo;
+    }
+}
+
+/* UPDATE */
+$sql = "UPDATE responsable SET 
+            nombre='$nuevoNombre',
+            correo='$correo',
+            imagen='$imagenNombre'";
+
+if (!empty($passwordNueva)) {
+    $sql .= ", contraseña='$passwordNueva'";
+}
+
+$sql .= " WHERE nombre='$usuarioActual'";
+
+/* EJECUTAR */
 if (mysqli_query($conn, $sql)) {
 
     $_SESSION['usuario'] = $nuevoNombre;
 
-    echo "<script>
-        alert(' Perfil actualizado correctamente');
-        window.location.href='../perfil.php';
-    </script>";
+    header("Location: ../perfil.php?ok=1");
+    exit();
 
 } else {
     echo "Error: " . mysqli_error($conn);

@@ -37,7 +37,7 @@ $res = $conn->query($sql);
     <title>Eventos Registrados</title>
 
     <?php include("../menu/php/encabezado.php"); ?>
-    <link rel="icon" href="../img/control.png" type="image/png">
+    <link rel="icon" href="../img/logo.png" type="image/png">
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link href="../css/sb-admin-2.min.css" rel="stylesheet">
 

@@ -1,4 +1,6 @@
 <?php
+session_start();
+session_destroy();
 require_once "../config/conexion.php";
 $escuelas = $conn->query("SELECT * FROM escuela");
 $eventos = $conn->query("SELECT * FROM evento");
@@ -9,7 +11,7 @@ $eventos = $conn->query("SELECT * FROM evento");
 
 <head>
     <!-- ICONO -->
-    <link rel="icon" href="../img/control.png" type="image/png">
+    <link rel="icon" href="../img/logo.png" type="image/png">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Registro Alumno - IntegraGames</title>

@@ -1,13 +1,17 @@
 <?php
 session_start();
+include("../config/conexion.php");
 
-/* Verificar si inició sesión */
+/* Verificar sesión */
 if (!isset($_SESSION['usuario'])) {
     header("Location: ../RegistroAdmin/login.php");
     exit();
 }
 
 $rol = $_SESSION['rol'];
+
+/* ROLES QUE VERÁN EVENTOS */
+$rolesPermitidos = ['administrador', 'programador', 'promotor'];
 ?>
 
 <!DOCTYPE html>
@@ -15,10 +19,7 @@ $rol = $_SESSION['rol'];
 
 <head>
     <?php include("php/encabezado.php"); ?>
-    <!-- ICONO -->
-    <link rel="icon" href="../img/control.png" type="image/png">
-
-    <!-- CSS -->
+    <link rel="icon" href="../img/logo.png" type="image/png">
     <link href="../css/styles.css" rel="stylesheet">
 </head>
 
@@ -26,18 +27,15 @@ $rol = $_SESSION['rol'];
 
     <div id="wrapper">
 
-        <!-- MENU LATERAL -->
+        <!-- MENU -->
         <?php include("php/menuLateral.php"); ?>
 
         <div id="content-wrapper" class="d-flex flex-column">
-
             <div id="content">
 
-                <!-- BARRA SUPERIOR -->
+                <!-- BARRA -->
                 <?php include("php/barraSuperior.php"); ?>
-               
 
-                <!-- CONTENIDO -->
                 <div class="container-fluid">
 
                     <!-- ENCABEZADO -->
@@ -47,62 +45,116 @@ $rol = $_SESSION['rol'];
                                 <div class="card-body text-center">
                                     <h4 class="font-weight-bold">IntegraGames</h4>
                                     <p class="mb-0">
-                                        Es una plataforma interactiva para la promocion de la carrera de Tecnoloía de la informacion, con contenido educativo y entretenido, para los amantes de los videojuegos.
+                                        Plataforma interactiva para la promoción de TI con contenido educativo y entretenido.
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- TARJETAS DE JUEGOS -->
+                    <!-- TARJETAS -->
                     <div class="row">
 
                         <?php
-                        $juegos = [
-                            [
-                                "nombre" => "Tecologia de la informacion",
-                                "imagen" => "../img/utm2.png",
-                                "descripcion" => "Es una carrera muy interesante, con muchas oportunidades laborales"
-                            ],
-                            [
-                                "nombre" => "Por que estudiar en la UTM",
-                                "imagen" => "../img/imagen3.jpeg",
-                                "descripcion" => "La UTM ofrece una educacion de calidad, con profesores altamente capacitados y una amplia variendad de conocimientes"
-                            ],
-                            [
-                                "nombre" => "Te gustan los videojuegos?",
-                                "imagen" => "../img/imagen3.jpeg",
-                                "descripcion" => "Si te gustan los videojuegos, la carrera de TI es para ti, ya que podras aprender a crear y programar tus propios juegos  "
-                            ],
-                            [
-                                "nombre" => "Día de San Valentín",
-                                "imagen" => "../img/imagen4.jpeg",
-                                "descripcion" => "Descripción del 4"
-                            ]
-                        ];
+                        /* ADMIN / PROMOTOR / PROGRAMADOR*/
+                        if (in_array(strtolower($rol), ['administrador', 'programador', 'promotor'])) {
 
-                        foreach ($juegos as $juego) {
+                            $hoy = date("Y-m-d");
+
+                            $sql = "SELECT nombre_evento, imagen, observaciones, fecha 
+                        FROM evento
+                        WHERE fecha >= '$hoy'
+                        ORDER BY fecha ASC";
+
+                            $resultado = mysqli_query($conn, $sql);
+
+                            if ($resultado && mysqli_num_rows($resultado) > 0) {
+
+                                while ($evento = mysqli_fetch_assoc($resultado)) {
                         ?>
 
-                            <div class="col-lg-3 col-md-6 mb-4">
-                                <div class="card shadow h-100">
+                                    <div class="col-lg-3 col-md-6 mb-4">
+                                        <div class="card shadow h-100">
 
-                                    <!-- Imagen -->
-                                    <img src="<?php echo $juego['imagen']; ?>"
-                                        class="card-img-top img-uniforme">
+                                            <!-- Imagen -->
+                                            <img src="../img/eventos/<?php echo $evento['imagen']; ?>"
+                                                class="card-img-top img-uniforme">
 
-                                    <!-- Contenido -->
-                                    <div class="card-body d-flex flex-column">
-                                        <h6 class="font-weight-bold"><?php echo $juego['nombre']; ?></h6>
-                                        <p class="text-muted small">
-                                            <?php echo $juego['descripcion']; ?>
-                                        </p>
+                                            <!-- Info -->
+                                            <div class="card-body d-flex flex-column">
+                                                <h6 class="font-weight-bold">
+                                                    <?php echo $evento['nombre_evento']; ?>
+                                                </h6>
+
+                                                <p class="text-muted small">
+                                                    <?php echo $evento['observaciones']; ?>
+                                                </p>
+
+                                            </div>
+
+                                        </div>
                                     </div>
 
-                                </div>
-                            </div>
+                                <?php
+                                }
+                            } else {
+                                echo "<div class='col-12 text-center'>
+                            <p>No hay eventos programados.</p>
+                          </div>";
+                            }
 
-                        <?php } ?>
+                            /*PARTICIPANTE*/
+                        } else {
+
+                            $juegosInfo = [
+                                [
+                                    "nombre" => "Tecnología de la información",
+                                    "imagen" => "../img/utm2.png",
+                                    "descripcion" => "Carrera con muchas oportunidades laborales."
+                                ],
+                                [
+                                    "nombre" => "Por qué estudiar en la UTM",
+                                    "imagen" => "../img/imagen3.jpeg",
+                                    "descripcion" => "Educación de calidad y profesores capacitados."
+                                ],
+                                [
+                                    "nombre" => "¿Te gustan los videojuegos?",
+                                    "imagen" => "../img/imagen3.jpeg",
+                                    "descripcion" => "Aprende a crear tus propios videojuegos."
+                                ],
+                                [
+                                    "nombre" => "Día de San Valentín",
+                                    "imagen" => "../img/imagen4.jpeg",
+                                    "descripcion" => "Descripción del evento."
+                                ]
+                            ];
+
+                            foreach ($juegosInfo as $juego) {
+                                ?>
+
+                                <div class="col-lg-3 col-md-6 mb-4">
+                                    <div class="card shadow h-100">
+
+                                        <img src="<?php echo $juego['imagen']; ?>"
+                                            class="card-img-top img-uniforme">
+
+                                        <div class="card-body d-flex flex-column">
+                                            <h6 class="font-weight-bold">
+                                                <?php echo $juego['nombre']; ?>
+                                            </h6>
+
+                                            <p class="text-muted small">
+                                                <?php echo $juego['descripcion']; ?>
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                        <?php
+                            }
+                        }
+                        ?>
 
                     </div>
 
@@ -118,19 +170,19 @@ $rol = $_SESSION['rol'];
                             [
                                 "nombre" => "Error 404",
                                 "imagen" => "../img/uno/uno.png",
-                                "descripcion" => "Error 404 es un juego donde los jugadores tendran que ganar una partida de cartas.",
+                                "descripcion" => "Juego de cartas competitivo.",
                                 "link" => "../juegos/error404.php"
                             ],
                             [
                                 "nombre" => "Code Run",
                                 "imagen" => "../img/codeRun/runCode.png",
-                                "descripcion" => "Code Run es un juego donde tendras que pasar cada nivel sin que seas derivado por las carpetas enemigas .",
+                                "descripcion" => "Evita enemigos y supera niveles.",
                                 "link" => "../juegos/codeRun.php"
                             ],
                             [
                                 "nombre" => "Juego 3",
                                 "imagen" => "../img/juego3.jpg",
-                                "descripcion" => "Descripción del juego 3, reglas básicas.",
+                                "descripcion" => "Reglas básicas del juego.",
                                 "link" => "../juegos/juego3.php"
                             ]
                         ];
@@ -144,13 +196,11 @@ $rol = $_SESSION['rol'];
 
                                         <div class="row align-items-center">
 
-                                            <!-- Imagen -->
                                             <div class="col-md-4">
                                                 <img src="<?php echo $juego['imagen']; ?>"
                                                     class="img-fluid rounded img-uniforme">
                                             </div>
 
-                                            <!-- Info -->
                                             <div class="col-md-6">
                                                 <h5><?php echo $juego['nombre']; ?></h5>
                                                 <p class="text-muted">
@@ -158,7 +208,6 @@ $rol = $_SESSION['rol'];
                                                 </p>
                                             </div>
 
-                                            <!-- Botón -->
                                             <div class="col-md-2 text-center">
                                                 <a href="<?php echo $juego['link']; ?>"
                                                     class="btn btn-primary btn-sm">
@@ -176,32 +225,26 @@ $rol = $_SESSION['rol'];
 
                     </div>
 
-                </div> <!-- FIN container-fluid -->
-
+                </div>
             </div>
 
             <!-- FOOTER -->
             <?php include("php/piePagina.php"); ?>
 
         </div>
-
     </div>
 
-    <!-- BOTÓN SCROLL -->
+    <!-- SCROLL -->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
 
     <?php include("php/logoutModal.php"); ?>
 
-    <!-- SCRIPTS -->
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="../js/sb-admin-2.min.js"></script>
-
-    
-
 
 </body>
 

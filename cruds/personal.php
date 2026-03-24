@@ -79,7 +79,7 @@ if (isset($_POST['eliminar'])) {
 
 <head>
     <?php include("../menu/php/encabezado.php"); ?>
-    <link rel="icon" href="../img/control.png">
+    <link rel="icon" href="../img/logo.png">
     <link href="../css/styles.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -153,7 +153,7 @@ if (isset($_POST['eliminar'])) {
                                             <!-- BOTONES -->
                                             <div>
 
-                                                <!-- EDITAR 
+                                                <!-- EDITAR -->
                                                 <button class="btn btn-info btn-sm"
                                                     data-toggle="modal"
                                                     data-target="#modalEditar"
@@ -166,7 +166,7 @@ if (isset($_POST['eliminar'])) {
                                                         '<?= $imagen ?>'
                                                         )">
                                                     <i class="fas fa-edit"></i>
-                                                </button> -->
+                                                </button> 
 
                                                 <!-- ELIMINAR -->
                                                 <button class="btn btn-danger btn-sm"
@@ -197,7 +197,7 @@ if (isset($_POST['eliminar'])) {
         </div>
     </div>
 
-    <!-- ===================== MODALES ===================== -->
+    <!--MODALES -->
 
     <!-- CREAR -->
     <div class="modal fade" id="modalCrear">

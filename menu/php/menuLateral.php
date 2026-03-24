@@ -28,65 +28,68 @@
     $esPromotor = ($rol == "promotor");
     ?>
 
-    <hr class="sidebar-divider">
-
-    <div class="sidebar-heading">
-        Administración
-    </div>
-
-    <!-- PERSONAL (solo admin) -->
-    <?php if ($esAdmin) { ?>
-        <li class="nav-item">
-            <a class="nav-link" href="../cruds/personal.php">
-                <i class="fas fa-user"></i>
-                <span>Personal</span>
-            </a>
-        </li>
-    <?php } ?>
-
-    <!-- EVENTOS (admin, programador, promotor) -->
     <?php if ($esAdmin || $esProgramador || $esPromotor) { ?>
-        <li class="nav-item">
-            <a class="nav-link" href="../cruds/eventos.php">
-                <i class="fas fa-calendar-alt"></i>
-                <span>Eventos</span>
-            </a>
-        </li>
-    <?php } ?>
+        <hr class="sidebar-divider">
 
-    <!-- ESCUELAS (admin y programador) -->
-    <?php if ($esAdmin || $esProgramador) { ?>
-        <li class="nav-item">
-            <a class="nav-link"  href="../registroEscuela/escuelas.php">
-                <i class="fas fa-school"></i>
-                <span>Escuelas</span>
-            </a>
-        </li>
-    <?php } ?>
 
-    <!-- HISTORIAL (admin y programador) -->
-    <?php if ($esAdmin || $esProgramador) { ?>
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsuarios"
-                aria-expanded="false" aria-controls="collapseUsuarios">
-                <i class="fas fa-users"></i>
-                <span>Historial</span>
-            </a>
+        <div class="sidebar-heading">
+            Administración
+        </div>
 
-            <div id="collapseUsuarios" class="collapse" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Historial:</h6>
+        <!-- PERSONAL (solo admin) -->
+        <?php if ($esAdmin) { ?>
+            <li class="nav-item">
+                <a class="nav-link" href="../cruds/personal.php">
+                    <i class="fas fa-user"></i>
+                    <span>Personal</span>
+                </a>
+            </li>
+        <?php } ?>
 
-                    <a class="collapse-item" href="../cruds/encargadoEvento.php">
-                        <i class="fas fa-user-tie"></i> Eventos
-                    </a>
+        <!-- EVENTOS (admin, programador, promotor) -->
+        <?php if ($esAdmin || $esProgramador || $esPromotor) { ?>
+            <li class="nav-item">
+                <a class="nav-link" href="../cruds/eventos.php">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Eventos</span>
+                </a>
+            </li>
+        <?php } ?>
 
-                    <a class="collapse-item" href="../cruds/lista.php">
-                        <i class="fas fa-users"></i> Participantes
-                    </a>
+        <!-- ESCUELAS (admin y programador) -->
+        <?php if ($esAdmin || $esProgramador) { ?>
+            <li class="nav-item">
+                <a class="nav-link" href="../registroEscuela/escuelas.php">
+                    <i class="fas fa-school"></i>
+                    <span>Escuelas</span>
+                </a>
+            </li>
+        <?php } ?>
+
+        <!-- HISTORIAL (admin y programador) -->
+        <?php if ($esAdmin || $esProgramador) { ?>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsuarios"
+                    aria-expanded="false" aria-controls="collapseUsuarios">
+                    <i class="fas fa-users"></i>
+                    <span>Historial</span>
+                </a>
+
+                <div id="collapseUsuarios" class="collapse" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Historial:</h6>
+
+                        <a class="collapse-item" href="../cruds/encargadoEvento.php">
+                            <i class="fas fa-user-tie"></i> Eventos
+                        </a>
+
+                        <a class="collapse-item" href="../cruds/lista.php">
+                            <i class="fas fa-users"></i> Participantes
+                        </a>
+                    </div>
                 </div>
-            </div>
-        </li>
+            </li>
+        <?php } ?>
     <?php } ?>
 
     <hr class="sidebar-divider">
@@ -96,15 +99,9 @@
         Información
     </div>
 
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-info-circle"></i>
-            <span>Información</span>
-        </a>
-    </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="https://share.google/2xNdfPbTZln7FfE9E">
             <i class="fas fa-university"></i>
             <span>UTM</span>
         </a>

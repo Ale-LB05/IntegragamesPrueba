@@ -14,7 +14,7 @@ $rol = $_SESSION['rol'];
 
 <head>
     <?php include("../menu/php/encabezado.php"); ?>
-    <link rel="icon" href="../img/control.png" type="image/png">
+    <link rel="icon" href="../img/logo.png" type="image/png">
     <link href="../css/styles.css" rel="stylesheet">
 </head>
 
