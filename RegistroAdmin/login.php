@@ -73,12 +73,6 @@
                                     placeholder="Ingresa tu contraseña"
                                     required>
                             </div>
-                            <?php if (isset($_GET['error'])) { ?>
-
-                                <div class="alert alert-danger text-center">
-                                    Correo o contraseña incorrectos
-                                </div>
-                            <?php } ?>
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="fa-solid fa-right-to-bracket"></i>
                                 Iniciar sesión
@@ -97,6 +91,23 @@
         </div>
     </div>
     <script src="../js/login.js"></script>
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <?php if (isset($_GET['error'])) { ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Correo o contraseña incorrectos',
+                    confirmButtonColor: '#0072ff',
+                    background: '#fff',
+                    heightAuto: false
+                });
+            });
+        </script>
+    <?php } ?>
 
 </body>
 

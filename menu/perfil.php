@@ -32,6 +32,7 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
 <head>
     <?php include("../menu/php/encabezado.php"); ?>
     <link rel="icon" href="../img/logo.png" type="image/png">
+    <link href="../css/styles.css" rel="stylesheet">
 
     <style>
         .perfil-container {

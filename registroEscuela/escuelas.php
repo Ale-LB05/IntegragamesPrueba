@@ -86,15 +86,39 @@ $res = $conn->query("SELECT * FROM escuela");
 
                 <div class="container-fluid">
 
-                    <!-- ENCABEZADO -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card shadow">
-                                <div class="card-body text-center">
-                                    <h4 class="font-weight-bold">Gestión de Escuelas</h4>
-                                    <p class="mb-0">Administra las escuelas registradas en el sistema</p>
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
+
+                        <!-- TITULO -->
+                        <h1 class="h3 text-gray-800 mb-2">Gestión de Escuelas</h1>
+
+                        <!-- DERECHA -->
+                        <div class="d-flex align-items-center flex-wrap">
+
+                            <!-- BUSCADOR -->
+                            <div class="input-group mr-2 mb-2" style="width: 550px;">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-search"></i>
+                                    </span>
                                 </div>
+                                <input type="text" id="buscador" class="form-control"
+                                    placeholder="Buscar evento...">
+                                    
+                                <select id="orden" class="form-control w-25">
+                                    <option value="asc">A - Z</option>
+                                    <option value="desc">Z - A</option>
+                                </select>
                             </div>
+
+
+                            <!-- BOTON -->
+                            <button class="btn btn-success mb-2"
+                                data-toggle="modal"
+                                data-target="#modalAgregar">
+
+                                <i class="fas fa-plus"></i> Nueva Escuela
+                            </button>
+
                         </div>
                     </div>
 
@@ -102,25 +126,11 @@ $res = $conn->query("SELECT * FROM escuela");
                     <div class="card shadow">
                         <div class="card-body">
 
-                            <div class="d-flex mb-3">
-                                <input type="text" id="buscador" class="form-control mr-2" placeholder="Buscar escuela...">
-
-                                <select id="orden" class="form-control w-25">
-                                    <option value="asc">A - Z</option>
-                                    <option value="desc">Z - A</option>
-                                </select>
-
-                                <button class="btn btn-success ml-2" data-toggle="modal" data-target="#modalAgregar">
-                                    + Nueva
-                                </button>
-                            </div>
-
                             <div class="table-responsive">
                                 <table class="table table-bordered text-center" id="tablaEscuelas">
 
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
                                             <th>Nombre</th>
                                             <th>Dirección</th>
                                             <th>Teléfono</th>
@@ -138,12 +148,11 @@ $res = $conn->query("SELECT * FROM escuela");
 
                                         <?php while ($row = $res->fetch_assoc()) { ?>
                                             <tr>
-                                                <td><?= $row['id_escuela'] ?></td>
                                                 <td><?= $row['nombre_escuela'] ?></td>
                                                 <td><?= $row['direccion'] ?></td>
                                                 <td><?= $row['telefono'] ?></td>
                                                 <td>
-                                                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#editar<?= $row['id_escuela'] ?>">
+                                                    <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#editar<?= $row['id_escuela'] ?>">
                                                         Editar
                                                     </button>
                                                 </td>

@@ -3,7 +3,8 @@ session_start();
 session_destroy();
 require_once "../config/conexion.php";
 $escuelas = $conn->query("SELECT * FROM escuela");
-$eventos = $conn->query("SELECT * FROM evento");
+// Consulta filtrada: Solo eventos con la fecha de HOY
+$eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
 ?>
 
 <!DOCTYPE html>
@@ -31,6 +32,7 @@ $eventos = $conn->query("SELECT * FROM evento");
             border: none;
             border-radius: 15px;
         }
+
         .btn-primary {
             background: #00c6ff;
             border: none;
@@ -99,11 +101,15 @@ $eventos = $conn->query("SELECT * FROM evento");
                             <div class="mb-3">
                                 <label class="form-label">Evento</label>
                                 <select class="form-control" name="id_evento" required>
-                                    <option value="">Selecciona un evento</option>
-                                    <?php while ($evento = $eventos->fetch_assoc()) { ?>
-                                        <option value="<?php echo $evento['id_evento']; ?>">
-                                            <?php echo $evento['nombre_evento']; ?>
-                                        </option>
+                                    <?php if ($eventos->num_rows > 0) { ?>
+                                        <option value="">Selecciona el evento</option>
+                                        <?php while ($evento = $eventos->fetch_assoc()) { ?>
+                                            <option value="<?php echo $evento['id_evento']; ?>">
+                                                <?php echo $evento['nombre_evento']; ?>
+                                            </option>
+                                        <?php } ?>
+                                    <?php } else { ?>
+                                        <option value="">No hay eventos programados para hoy</option>
                                     <?php } ?>
                                 </select>
                             </div>

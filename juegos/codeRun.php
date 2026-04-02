@@ -103,7 +103,6 @@ $rol = $_SESSION['rol'];
                                         Jugar
                                     </a>
                                 </div>
-
                             </div>
 
                         </div>

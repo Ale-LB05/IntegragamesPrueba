@@ -24,7 +24,6 @@ LEFT JOIN responsable r ON er.id_responsable = r.id_responsable
 LEFT JOIN participante p ON e.id_evento = p.id_evento
 GROUP BY e.id_evento";
 
-$res = $conn->query($sql);
 
 $res = $conn->query($sql);
 ?>
@@ -39,7 +38,7 @@ $res = $conn->query($sql);
     <?php include("../menu/php/encabezado.php"); ?>
     <link rel="icon" href="../img/logo.png" type="image/png">
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
-    <link href="../css/sb-admin-2.min.css" rel="stylesheet">
+    <link href="../css/styles.css" rel="stylesheet">
 
     <style>
         body {
@@ -82,7 +81,7 @@ $res = $conn->query($sql);
     </style>
 </head>
 
-<body id="page-top" class="sidebar-toggled">
+<body id="page-top">
 
     <div id="wrapper">
 
@@ -96,22 +95,30 @@ $res = $conn->query($sql);
                 <!-- ENCABEZADO SUPERIOR -->
                 <?php include("../menu/php/barraSuperior.php"); ?>
 
-                <!-- CONTENIDO PRINCIPAL -->
-                <div class="container-fluid mt-4">
-
-                    <h2>Eventos Registrados</h2>
-
-                    <div class="card p-3">
-
+                <div class="container-fluid">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
+                        <h1 class="h3 text-gray-800 mb-2">Eventos Registrados</h1>
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <!-- BUSCADOR -->
+                             <div class="input-group mr-2 mb-2" style="width: 400px;">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-search"></i>
+                            </span>
                             <input type="text" id="buscador" class="form-control w-50" placeholder="Buscar evento...">
+                        </div>
 
                             <!-- BOTÓN -->
-                            <button onclick="exportTableToExcel()" class="btn btn-success">
+                            <button onclick="exportTableToExcel()" class="btn btn-success mb-2">
                                 Exportar a Excel
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- CONTENIDO PRINCIPAL -->
+                <div class="container-fluid mt-4">
+
+                    <div class="card p-3">
                         <!-- TOTAL -->
                         <p><strong>Total de registros:</strong> <?= $res->num_rows ?></p>
 

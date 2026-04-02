@@ -35,7 +35,6 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
 
                 <!-- BARRA -->
                 <?php include("php/barraSuperior.php"); ?>
-
                 <div class="container-fluid">
 
                     <!-- ENCABEZADO -->
@@ -45,7 +44,8 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                                 <div class="card-body text-center">
                                     <h4 class="font-weight-bold">IntegraGames</h4>
                                     <p class="mb-0">
-                                        Plataforma interactiva para la promoción de TI con contenido educativo y entretenido.
+                                        IntegraGames es una plataforma web interactiva diseñada para promover la carrera de Tecnologías de la Información (TI) de la UTM mediante la gamificación.
+                                        El sistema combina el aprendizaje con el entretenimiento para que futuros estudiantes conozcan el plan de estudios y conceptos clave de programación de forma dinámica.
                                     </p>
                                 </div>
                             </div>
@@ -61,10 +61,10 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
 
                             $hoy = date("Y-m-d");
 
-                            $sql = "SELECT nombre_evento, imagen, observaciones, fecha 
-                        FROM evento
-                        WHERE fecha >= '$hoy'
-                        ORDER BY fecha ASC";
+                            $sql = "SELECT nombre_evento, imagen, observaciones, fecha, hora, lugar, ubicacion
+                                    FROM evento
+                                    WHERE fecha >= '$hoy'
+                                    ORDER BY fecha ASC";
 
                             $resultado = mysqli_query($conn, $sql);
 
@@ -75,23 +75,51 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
 
                                     <div class="col-lg-3 col-md-6 mb-4">
                                         <div class="card shadow h-100">
-
-                                            <!-- Imagen -->
                                             <img src="../img/eventos/<?php echo $evento['imagen']; ?>"
-                                                class="card-img-top img-uniforme">
+                                                class="card-img-top img-uniforme" alt="Imagen del evento">
 
-                                            <!-- Info -->
                                             <div class="card-body d-flex flex-column">
-                                                <h6 class="font-weight-bold">
-                                                    <?php echo $evento['nombre_evento']; ?>
+                                                <h6 class="font-weight-bold text-black mb-2">
+                                                    <?php echo htmlspecialchars($evento['nombre_evento']); ?>
                                                 </h6>
 
-                                                <p class="text-muted small">
-                                                    <?php echo $evento['observaciones']; ?>
+                                                <p class="text-muted small mb-1">
+                                                    <i class="fas fa-calendar-alt fa-fw mr-1"></i>
+                                                    <strong>Fecha:</strong> <?php echo date("d/m/Y", strtotime($evento['fecha'])); ?>
                                                 </p>
 
-                                            </div>
+                                                <?php if (!empty($evento['hora'])): ?>
+                                                    <p class="text-muted small mb-1">
+                                                        <i class="fas fa-clock fa-fw mr-1"></i>
+                                                        <strong>Hora:</strong> <?php echo date("h:i A", strtotime($evento['hora'])); ?>
+                                                    </p>
+                                                <?php endif; ?>
 
+                                                <p class="text-muted small mb-1">
+                                                    <i class="fas fa-map-marker-alt fa-fw mr-1"></i>
+                                                    <strong>Lugar:</strong> <?php echo htmlspecialchars($evento['lugar'] ?? 'Ubicación no disponible'); ?>
+                                                </p>
+
+                                                <p class="text-muted small mb-1">
+                                                    <i class="fas fa-map-marker-alt fa-fw mr-1"></i>
+                                                    <strong>Ubicación:</strong> <?php echo htmlspecialchars($evento['ubicacion'] ?? 'No especificado'); ?>
+
+                                                    <?php if (!empty($evento['ubicacion'])): ?>
+                                                        <a href="https://www.google.com/maps/search/?api=1&query=<?php echo $evento['ubicacion']; ?>"
+                                                            target="_blank"
+                                                            class="btn btn-sm btn-outline-primary p-0 px-1 ml-1 ms-2"
+                                                            title="Ver en el mapa"
+                                                            style="font-size: 0.7rem; border-radius: 10px;">
+                                                            <i class="fas fa-map-marker-alt"></i> Ver Mapa
+                                                        </a>
+                                                    <?php endif; ?>
+                                                </p>
+
+                                                <p class="text-dark small mb-0">
+                                                    <i class="fas fa-info-circle fa-fw mr-1"></i>
+                                                    <?php echo htmlspecialchars($evento['observaciones']); ?>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -108,24 +136,24 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
 
                             $juegosInfo = [
                                 [
-                                    "nombre" => "Tecnología de la información",
+                                    "nombre" => "Domina el Futuro Digital",
                                     "imagen" => "../img/utm2.png",
-                                    "descripcion" => "Carrera con muchas oportunidades laborales."
+                                    "descripcion" => "Convierte tu pasión por la tecnología en soluciones reales. En TI, no solo usas el futuro, ¡tú lo programas!"
                                 ],
                                 [
-                                    "nombre" => "Por qué estudiar en la UTM",
+                                    "nombre" => "Experiencia UTM",
                                     "imagen" => "../img/imagen3.jpeg",
-                                    "descripcion" => "Educación de calidad y profesores capacitados."
+                                    "descripcion" => "Aprende con proyectos prácticos y laboratorios de vanguardia. Formamos los líderes tecnológicos que el mundo necesita."
                                 ],
                                 [
-                                    "nombre" => "¿Te gustan los videojuegos?",
+                                    "nombre" => "De Gamer a Desarrollador",
                                     "imagen" => "../img/imagen3.jpeg",
-                                    "descripcion" => "Aprende a crear tus propios videojuegos."
+                                    "descripcion" => "Lleva tu nivel al siguiente paso. Aprende lógica de programación creando mundos y mecánicas de juego increíbles."
                                 ],
                                 [
-                                    "nombre" => "Día de San Valentín",
+                                    "nombre" => "¡Únete a la Comunidad!",
                                     "imagen" => "../img/imagen4.jpeg",
-                                    "descripcion" => "Descripción del evento."
+                                    "descripcion" => "Participa en eventos, torneos y desafíos. IntegraGames es solo el inicio de tu viaje en las Tecnologías de la Información."
                                 ]
                             ];
 
@@ -210,8 +238,7 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
 
                                             <div class="col-md-2 text-center">
                                                 <a href="<?php echo $juego['link']; ?>"
-                                                    class="btn btn-primary btn-sm">
-                                                    Ver más
+                                                    class="btn btn-primary btn-sm text-white"> Ver más
                                                 </a>
                                             </div>
 
@@ -230,6 +257,19 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
 
             <!-- FOOTER -->
             <?php include("php/piePagina.php"); ?>
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <?php if (isset($_GET['login'])) { ?>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Bienvenido',
+                            text: 'Inicio de sesión exitoso'
+                        });
+                    });
+                </script>
+            <?php } ?>
 
         </div>
     </div>

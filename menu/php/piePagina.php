@@ -1,8 +1,8 @@
 <!-- Footer -->
-<footer class="sticky-footer bg-white">
+<footer class="sticky-footer bg-transparent">
     <div class="container my-auto">
         <div class="copyright text-center my-auto">
-            <span>Copyright &copy; IntegraGames 2026</span>
+            <span class="text-secondary">Copyright &copy; IntegraGames 2026</span>
         </div>
     </div>
 </footer>

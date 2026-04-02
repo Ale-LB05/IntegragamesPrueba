@@ -98,21 +98,33 @@ if (isset($_POST['eliminar'])) {
                 <?php include("../menu/php/barraSuperior.php"); ?>
 
                 <div class="container-fluid">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
 
-                    <!-- TÍTULO -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 text-gray-800">Panel de personal</h1>
+                        <!-- TITULO -->
+                        <h1 class="h3 text-gray-800 mb-2">Panel de personal</h1>
+
+                        <!-- DERECHA -->
+                        <div class="d-flex align-items-center flex-wrap">
+                            <!-- BUSCADOR -->
+                            <div class="input-group mr-2 mb-2" style="width: 400px;">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" id="buscador" class="form-control"
+                                    placeholder="Buscar por nombre o rol...">
+                            </div>
+                            <!-- BOTON -->
+                            <button class="btn btn-success mb-2"
+                                data-toggle="modal"
+                                data-target="#modalCrear">
+                                <i class="fas fa-plus"></i> Nuevo Empleado
+                            </button>
+
+                        </div>
                     </div>
 
                     <!-- CARD PRINCIPAL -->
                     <div class="card shadow mb-4">
-
-                        <div class="card-header">
-                            <button class="btn btn-success" data-toggle="modal" data-target="#modalCrear">
-                                <i class="fas fa-plus"></i> Nuevo empleado
-                            </button>
-                        </div>
-
                         <div class="card-body">
 
                             <div class="row">
@@ -123,7 +135,10 @@ if (isset($_POST['eliminar'])) {
                                 while ($row = $res->fetch_assoc()) {
                                 ?>
 
-                                    <div class="col-12 mb-3">
+                                    <div class="col-12 mb-3 empleado-item"
+                                        data-nombre="<?= strtolower($row['nombre']) ?>"
+                                        data-rol="<?= strtolower($row['rol']) ?>">
+
                                         <div class="card shadow-sm p-3 d-flex flex-row justify-content-between align-items-center" style="border-radius:15px;">
 
                                             <!-- IZQUIERDA -->
@@ -166,7 +181,7 @@ if (isset($_POST['eliminar'])) {
                                                         '<?= $imagen ?>'
                                                         )">
                                                     <i class="fas fa-edit"></i>
-                                                </button> 
+                                                </button>
 
                                                 <!-- ELIMINAR -->
                                                 <button class="btn btn-danger btn-sm"
@@ -349,6 +364,30 @@ if (isset($_POST['eliminar'])) {
                 icon.classList.add("fa-eye");
             }
         }
+
+        let buscador = document.getElementById("buscador");
+
+        buscador.addEventListener("keyup", function() {
+
+            let texto = buscador.value.toLowerCase();
+            let empleados = document.querySelectorAll(".empleado-item");
+
+            empleados.forEach(empleado => {
+
+                let nombre = empleado.getAttribute("data-nombre");
+                let rol = empleado.getAttribute("data-rol");
+
+                if (
+                    nombre.includes(texto) ||
+                    rol.includes(texto)
+                ) {
+                    empleado.style.display = "";
+                } else {
+                    empleado.style.display = "none";
+                }
+
+            });
+        });
     </script>
 
 </body>
