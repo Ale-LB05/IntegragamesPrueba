@@ -577,6 +577,18 @@ $sqlPasados = "SELECT * FROM evento WHERE fecha < '$hoy' ORDER BY fecha DESC";
 
             });
         });
+
+        
+        $('form').on('submit', function() {
+            Swal.fire({
+                title: 'Guardando...',
+                text: 'Por favor espera un momento',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading()
+                }
+            });
+        });
     </script>
 
 </body>

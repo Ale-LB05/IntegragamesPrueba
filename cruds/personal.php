@@ -13,45 +13,54 @@ if (!isset($_SESSION['usuario'])) {
     exit();
 }
 
-/* CREAR */
-if (isset($_POST['crear'])) {
+$mensaje = "";
+$tipo = "";
 
-    $nombre = $_POST['nombre'];
-    $correo = $_POST['correo'];
-    $contraseña = $_POST['contrasena'];
-    $rol = $_POST['rol'];
+/* --- CREAR --- */
+if (isset($_POST['crear'])) {
+    // Escapamos los datos para evitar errores de sintaxis y XSS
+    $nombre = $conn->real_escape_string($_POST['nombre']);
+    $correo = $conn->real_escape_string($_POST['correo']);
+    $contraseña = $conn->real_escape_string($_POST['contrasena']);
+    $rol = $conn->real_escape_string($_POST['rol']);
 
     // IMAGEN POR DEFECTO
     $imagenNombre = "sinFoto.jpg";
 
     $sql = "INSERT INTO responsable(nombre, correo, contraseña, rol, imagen)
             VALUES('$nombre','$correo','$contraseña','$rol','$imagenNombre')";
-    $conn->query($sql);
+
+    // Ejecutamos la consulta UNA SOLA VEZ dentro del condicional
+    if ($conn->query($sql)) {
+        $mensaje = "Empleado creado correctamente";
+        $tipo = "success";
+    } else {
+        $mensaje = "Error al crear empleado: " . $conn->error;
+        $tipo = "error";
+    }
 }
 
-/* EDITAR */
+/* --- EDITAR --- */
 if (isset($_POST['editar'])) {
-
-    $id = $_POST['id'];
-    $nombre = $_POST['nombre'];
-    $correo = $_POST['correo'];
-    $contraseña = $_POST['contrasena'];
-    $rol = $_POST['rol'];
+    $id = intval($_POST['id']);
+    $nombre = $conn->real_escape_string($_POST['nombre']);
+    $correo = $conn->real_escape_string($_POST['correo']);
+    $contraseña = $conn->real_escape_string($_POST['contrasena']);
+    $rol = $conn->real_escape_string($_POST['rol']);
 
     // OBTENER IMAGEN ACTUAL
     $sqlImg = $conn->query("SELECT imagen FROM responsable WHERE id_responsable='$id'");
-    $imagenNombre = "";
+    $imagenNombre = "sinFoto.jpg"; // Por si no hay previa
 
     if ($sqlImg && $sqlImg->num_rows > 0) {
         $fila = $sqlImg->fetch_assoc();
         $imagenNombre = $fila['imagen'];
     }
 
-    // NUEVA IMAGEN
+    // NUEVA IMAGEN (Si el usuario subió una)
     if (!empty($_FILES['imagen']['name'])) {
         $imagenNombre = time() . "_" . $_FILES['imagen']['name'];
         $ruta = "../img/responsables/" . $imagenNombre;
-
         move_uploaded_file($_FILES['imagen']['tmp_name'], $ruta);
     }
 
@@ -62,15 +71,28 @@ if (isset($_POST['editar'])) {
                 rol='$rol',
                 imagen='$imagenNombre'
             WHERE id_responsable='$id'";
-    $conn->query($sql);
+
+    // Ejecutamos la consulta UNA SOLA VEZ dentro del condicional
+    if ($conn->query($sql)) {
+        $mensaje = "Datos actualizados";
+        $tipo = "success";
+    } else {
+        $mensaje = "Error al actualizar: " . $conn->error;
+        $tipo = "error";
+    }
 }
 
-/* ELIMINAR */
+/* --- ELIMINAR --- */
 if (isset($_POST['eliminar'])) {
-    $id = $_POST['id_responsable'];
+    $id = intval($_POST['id_responsable']);
 
-    $sql = "DELETE FROM responsable WHERE id_responsable='$id'";
-    $conn->query($sql);
+    if ($conn->query("DELETE FROM responsable WHERE id_responsable='$id'")) {
+        $mensaje = "Empleado eliminado";
+        $tipo = "success";
+    } else {
+        $mensaje = "No se pudo eliminar";
+        $tipo = "error";
+    }
 }
 ?>
 
@@ -185,8 +207,6 @@ if (isset($_POST['eliminar'])) {
 
                                                 <!-- ELIMINAR -->
                                                 <button class="btn btn-danger btn-sm"
-                                                    data-toggle="modal"
-                                                    data-target="#modalEliminar"
                                                     onclick="borraRegistro('<?= $row['id_responsable'] ?>','<?= $row['nombre'] ?>')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
@@ -216,37 +236,54 @@ if (isset($_POST['eliminar'])) {
 
     <!-- CREAR -->
     <div class="modal fade" id="modalCrear">
-        <div class="modal-dialog">
-            <form method="POST" enctype="multipart/form-data" class="modal-content">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" enctype="multipart/form-data" class="modal-content shadow-lg border-0 rounded-4">
 
-                <div class="modal-header">
-                    <h5>Nuevo responsable</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <div class="modal-header bg-success text-white rounded-top-4">
+                    <h5 class="mb-0">Nuevo Responsable</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
 
                 <div class="modal-body">
-                    <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre" required>
-                    <input type="email" name="correo" class="form-control mb-2" placeholder="Correo" required>
-                    <div class="position-relative mb-2">
-                        <input type="password" name="contrasena" id="crearContrasena"
-                            class="form-control pr-5" placeholder="Nueva contraseña">
 
-                        <span onclick="togglePassword('crearContrasena', this)"
-                            style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer;">
-                            <i class="fa fa-eye"></i>
-                        </span>
+                    <label class="fw-bold">Nombre Completo</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Juan Pérez" required>
                     </div>
 
-                    <select name="rol" class="form-control">
-                        <option value="">Seleccionar rol</option>
-                        <option value="administrador">Administrador</option>
-                        <option value="programador">Programador</option>
-                        <option value="promotor">Promotor</option>
-                    </select>
+                    <label class="fw-bold">Correo Electrónico</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" name="correo" class="form-control" placeholder="correo@ejemplo.com" required autocomplete="off">
+                    </div>
+
+                    <label class="fw-bold">Contraseña</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" name="contrasena" id="crearContrasena" class="form-control" placeholder="Asignar contraseña" required autocomplete="new-password">
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('crearContrasena', this)">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <label class="fw-bold">Rol del Responsable</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                        <select name="rol" class="form-control" required>
+                            <option value="">Seleccionar rol...</option>
+                            <option value="administrador">Administrador</option>
+                            <option value="programador">Programador</option>
+                            <option value="promotor">Promotor</option>
+                        </select>
+                    </div>
+
                 </div>
 
                 <div class="modal-footer">
-                    <button name="crear" class="btn btn-success">Crear</button>
+                    <button type="submit" name="crear" class="btn btn-success px-4 rounded-pill">
+                        <i class="fas fa-save"></i> Crear Responsable
+                    </button>
                 </div>
 
             </form>
@@ -255,74 +292,66 @@ if (isset($_POST['eliminar'])) {
 
     <!-- EDITAR -->
     <div class="modal fade" id="modalEditar">
-        <div class="modal-dialog">
-            <form method="POST" enctype="multipart/form-data" class="modal-content">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" enctype="multipart/form-data" class="modal-content shadow-lg border-0 rounded-4">
 
-                <div class="modal-header bg-info text-white">
-                    <h5>Editar</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <div class="modal-header bg-info text-white rounded-top-4">
+                    <h5 class="mb-0"><i class="fas fa-user-edit"></i> Editar Responsable</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
 
                 <div class="modal-body">
-
                     <input type="hidden" name="id" id="editId">
-                    <div class="text-center mb-2">
-                        <img id="previewImagen"
-                            src=""
-                            style="width:70px; height:70px; object-fit:cover; border-radius:50%;">
+
+                    <label class="fw-bold d-block text-center">Imagen actual</label>
+                    <div class="text-center mb-3">
+                        <img id="previewImagen" src=""
+                            style="width:90px; height:90px; object-fit:cover; border-radius:50%; border:2px solid #17a2b8;">
                     </div>
 
-                    <input type="file" name="imagen" class="form-control">
+                    <label class="fw-bold">Cambiar Foto</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-image"></i></span>
+                        <input type="file" name="imagen" class="form-control">
+                    </div>
 
-                    <input type="text" name="nombre" id="editNombre" class="form-control mb-2">
-                    <input type="email" name="correo" id="editCorreo" class="form-control mb-2">
-                    <div class="position-relative mb-2">
-                        <input type="password" name="contrasena" id="editContrasena"
-                            class="form-control pr-5" placeholder="Nueva contraseña">
+                    <label class="fw-bold">Nombre Completo</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" name="nombre" id="editNombre" class="form-control" required autocomplete="off">
+                    </div>
 
-                        <span onclick="togglePassword('editContrasena', this)"
-                            style="position:absolute; right:15px; top:50%; transform:translateY(-50%); cursor:pointer;">
+                    <label class="fw-bold">Correo Electrónico</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        <input type="email" name="correo" id="editCorreo" class="form-control" required autocomplete="off">
+                    </div>
+
+                    <label class="fw-bold">Contraseña (Dejar vacío para no cambiar)</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" name="contrasena" id="editContrasena" class="form-control" placeholder="Nueva contraseña" autocomplete="new-password">
+                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('editContrasena', this)">
                             <i class="fa fa-eye"></i>
-                        </span>
+                        </button>
                     </div>
 
-                    <select name="rol" id="editRol" class="form-control">
-                        <option value="administrador">Administrador</option>
-                        <option value="programador">Programador</option>
-                        <option value="promotor">Promotor</option>
-                    </select>
-
+                    <label class="fw-bold">Rol del Responsable</label>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                        <select name="rol" id="editRol" class="form-control" required>
+                            <option value="administrador">Administrador</option>
+                            <option value="programador">Programador</option>
+                            <option value="promotor">Promotor</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button name="editar" class="btn btn-info">Guardar cambios</button>
+                    <button type="submit" name="editar" class="btn btn-info px-4 rounded-pill text-white">
+                        <i class="fas fa-save"></i> Guardar cambios
+                    </button>
                 </div>
-
-            </form>
-        </div>
-    </div>
-
-    <!-- ELIMINAR -->
-    <div class="modal fade" id="modalEliminar">
-        <div class="modal-dialog">
-            <form method="POST" class="modal-content">
-
-                <div class="modal-header bg-danger text-white">
-                    <h5>¿Eliminar registro?</h5>
-                </div>
-
-                <div class="modal-body text-center">
-                    <p>¿Seguro que deseas eliminar a:</p>
-                    <strong id="nombreEmpleado"></strong>
-
-                    <input type="hidden" name="id_responsable" id="deleteIdusuario">
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button name="eliminar" class="btn btn-danger">Sí, eliminar</button>
-                </div>
-
             </form>
         </div>
     </div>
@@ -332,27 +361,40 @@ if (isset($_POST['eliminar'])) {
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="../js/sb-admin-2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        function editarRegistro(id, nombre, correo, contrasena, rol, imagen) {
+        $(document).ready(function() {
+            // 1. Mostrar alerta si hay mensaje de PHP
+            <?php if (!empty($mensaje)) : ?>
+                Swal.fire({
+                    icon: <?php echo json_encode($tipo); ?>,
+                    title: <?php echo json_encode($mensaje); ?>,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            <?php endif; ?>
 
-            document.getElementById('editId').value = id;
-            document.getElementById('editNombre').value = nombre;
-            document.getElementById('editCorreo').value = correo;
-            document.getElementById('editContrasena').value = contrasena;
-            document.getElementById('editRol').value = rol;
-
-            document.getElementById('previewImagen').src = imagen;
-        }
-
-        function borraRegistro(id, nombre) {
-            document.getElementById('deleteIdusuario').value = id;
-            document.getElementById('nombreEmpleado').innerText = nombre;
-        }
-
+            // 2. Efecto de "Guardando..." en todos los formularios
+            $('form').on('submit', function() {
+                // Solo si el formulario es de Crear o Editar (no el de eliminar que manejamos aparte)
+                if (!$(this).find('button[name="eliminar"]').length) {
+                    Swal.fire({
+                        title: 'Procesando...',
+                        text: 'Guardando información del personal',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading()
+                        }
+                    });
+                }
+            });
+        });
+        // --- ESTA ES LA FUNCIÓN QUE TE FALTABA ---
         function togglePassword(id, icono) {
             let input = document.getElementById(id);
-            let icon = icono.querySelector("i");
+            // Buscamos el icono dentro del botón o el elemento clickeado
+            let icon = icono.querySelector("i") || icono;
 
             if (input.type === "password") {
                 input.type = "text";
@@ -365,29 +407,50 @@ if (isset($_POST['eliminar'])) {
             }
         }
 
-        let buscador = document.getElementById("buscador");
+        // Lógica para llenar el modal de editar
+        function editarRegistro(id, nombre, correo, contrasena, rol, imagen) {
+            document.getElementById('editId').value = id;
+            document.getElementById('editNombre').value = nombre; // Esto busca id="editNombre"
+            document.getElementById('editCorreo').value = correo; // Esto busca id="editCorreo"
+            document.getElementById('editContrasena').value = contrasena;
+            document.getElementById('editRol').value = rol;
+            document.getElementById('previewImagen').src = imagen;
+        }
 
-        buscador.addEventListener("keyup", function() {
+        // 3. Reemplazar el modal de eliminar de Bootstrap por SweetAlert2
+        function borraRegistro(id, nombre) {
+            Swal.fire({
+                title: '¿Eliminar a ' + nombre + '?',
+                text: "Esta acción no se puede deshacer",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Creamos un formulario dinámico para enviar el POST
+                    let form = document.createElement("form");
+                    form.method = "POST";
 
-            let texto = buscador.value.toLowerCase();
-            let empleados = document.querySelectorAll(".empleado-item");
+                    let inputId = document.createElement("input");
+                    inputId.type = "hidden";
+                    inputId.name = "id_responsable";
+                    inputId.value = id;
 
-            empleados.forEach(empleado => {
+                    let inputAccion = document.createElement("input");
+                    inputAccion.type = "hidden";
+                    inputAccion.name = "eliminar";
+                    inputAccion.value = "1";
 
-                let nombre = empleado.getAttribute("data-nombre");
-                let rol = empleado.getAttribute("data-rol");
-
-                if (
-                    nombre.includes(texto) ||
-                    rol.includes(texto)
-                ) {
-                    empleado.style.display = "";
-                } else {
-                    empleado.style.display = "none";
+                    form.appendChild(inputId);
+                    form.appendChild(inputAccion);
+                    document.body.appendChild(form);
+                    form.submit();
                 }
-
             });
-        });
+        }
     </script>
 
 </body>
