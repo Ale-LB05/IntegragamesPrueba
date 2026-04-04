@@ -41,6 +41,7 @@ $res = $conn->query($sql);
     <link rel="icon" href="../img/logo.png" type="image/png">
     <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet">
     <link href="../css/styles.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         body {
@@ -48,7 +49,7 @@ $res = $conn->query($sql);
             font-family: 'Segoe UI';
         }
 
-        h2 {
+        h1 {
             color: #1e3a8a;
             font-weight: bold;
         }
@@ -74,11 +75,13 @@ $res = $conn->query($sql);
 
         thead th {
             text-transform: uppercase;
-            font-size: 13px;
+            font-size: 11px;
+            vertical-align: middle !important;
         }
 
         tbody td {
             vertical-align: middle;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -87,49 +90,36 @@ $res = $conn->query($sql);
 
     <div id="wrapper">
 
-        <!-- MENU LATERAL -->
         <?php include("../menu/php/menuLateral.php"); ?>
 
-        <!-- CONTENIDO -->
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
 
-                <!-- ENCABEZADO SUPERIOR -->
                 <?php include("../menu/php/barraSuperior.php"); ?>
 
                 <div class="container-fluid">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-
-                        <h1 class="h3 text-gray-800 mb-2">Registros Completos</h1>
+                        <h1 class="h3 text-gray-800 mb-2">Registros de Participantes</h1>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <!-- BUSCADOR -->
                             <div class="input-group mr-2 mb-2" style="width: 400px;">
-                                <span class="input-group-text bg-white">
-                                    <i class="fas fa-search"></i>
-                                </span>
-                                <input type="text" id="buscador" class="form-control w-50" placeholder="Buscar evento...">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                                </div>
+                                <input type="text" id="buscador" class="form-control" placeholder="Buscar participante...">
                             </div>
 
-                            <!-- BOTÓN -->
-                            <button onclick="exportTableToExcel()" class="btn btn-success mb-2">
-                                Exportar a Excel
+                            <button onclick="confirmarExportacion()" class="btn btn-success mb-2">
+                                <i class="fas fa-file-excel"></i> Exportar a Excel
                             </button>
                         </div>
                     </div>
-                </div>
 
-                <!-- CONTENIDO PRINCIPAL -->
-                <div class="container-fluid mt-4">
-
-                    <div class="card p-3">
-
-                        <!-- TOTAL -->
+                    <div class="card p-3 shadow">
                         <p><strong>Total de registros:</strong> <?= $res->num_rows ?></p>
 
                         <div class="table-responsive">
-                            <table class="table table-bordered text-center">
-
+                            <table class="table table-bordered text-center" id="tablaParticipantes">
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
@@ -143,85 +133,109 @@ $res = $conn->query($sql);
                                         <th>Comentario</th>
                                     </tr>
                                 </thead>
-
                                 <tbody>
-
-                                    <?php if ($res->num_rows == 0) { ?>
+                                    <?php if ($res->num_rows == 0) : ?>
                                         <tr>
                                             <td colspan="9">No hay registros</td>
                                         </tr>
-                                    <?php } ?>
+                                    <?php endif; ?>
 
-                                    <?php while ($row = $res->fetch_assoc()) { ?>
+                                    <?php while ($row = $res->fetch_assoc()) : ?>
                                         <tr>
-                                            <td><?= $row['nombre'] ?></td>
+                                            <td><?= htmlspecialchars($row['nombre']) ?></td>
                                             <td><?= $row['edad'] ?></td>
-                                            <td><?= $row['nombre_evento'] ?? '-' ?></td>
-                                            <td><?= $row['nombre_escuela'] ?? '-' ?></td>
-                                            <td><?= $row['tipo_juego'] ?? '-' ?></td>
-                                            <td><?= $row['puntaje'] ?? '-' ?></td>
-
-                                            <td>
-                                                <?= $row['fecha'] ? date("d/m/Y", strtotime($row['fecha'])) : '-' ?>
-                                            </td>
-
+                                            <td><?= htmlspecialchars($row['nombre_evento'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($row['nombre_escuela'] ?? '-') ?></td>
+                                            <td><?= htmlspecialchars($row['tipo_juego'] ?? '-') ?></td>
+                                            <td><strong><?= $row['puntaje'] ?? '-' ?></strong></td>
+                                            <td><?= $row['fecha'] ? date("d/m/Y", strtotime($row['fecha'])) : '-' ?></td>
                                             <td>
                                                 <?php
                                                 $cal = $row['calificacion'];
-                                                if ($cal >= 8) {
-                                                    echo "<span class='badge badge-success'>$cal</span>";
-                                                } elseif ($cal >= 5) {
-                                                    echo "<span class='badge badge-warning'>$cal</span>";
-                                                } elseif ($cal !== null) {
-                                                    echo "<span class='badge badge-danger'>$cal</span>";
-                                                } else {
-                                                    echo "-";
-                                                }
+                                                if ($cal >= 8) echo "<span class='badge badge-success'>$cal</span>";
+                                                elseif ($cal >= 5) echo "<span class='badge badge-warning'>$cal</span>";
+                                                elseif ($cal !== null) echo "<span class='badge badge-danger'>$cal</span>";
+                                                else echo "-";
                                                 ?>
                                             </td>
-
-                                            <td><?= $row['comentario'] ?? '-' ?></td>
+                                            <td><small><?= htmlspecialchars($row['comentario'] ?? '-') ?></small></td>
                                         </tr>
-                                    <?php } ?>
-
+                                    <?php endwhile; ?>
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
                 </div>
-
             </div>
 
-            <!-- FOOTER -->
             <?php include("../menu/php/piePagina.php"); ?>
 
         </div>
     </div>
-    <?php include("../menu/php/logoutModal.php"); ?>
 
-    <!-- JS -->
     <script>
+        // Buscador
         document.getElementById("buscador").addEventListener("keyup", function() {
             let filtro = this.value.toLowerCase();
-            let filas = document.querySelectorAll("tbody tr");
-
+            let filas = document.querySelectorAll("#tablaParticipantes tbody tr");
             filas.forEach(fila => {
-                let texto = fila.textContent.toLowerCase();
-                fila.style.display = texto.includes(filtro) ? "" : "none";
+                fila.style.display = fila.textContent.toLowerCase().includes(filtro) ? "" : "none";
             });
         });
 
-        function exportTableToExcel() {
-            let table = document.querySelector("table").outerHTML;
-            let url = 'data:application/vnd.ms-excel,' + escape(table);
+        // VALIDACIÓN Y EXPORTACIÓN
+        function confirmarExportacion() {
+            Swal.fire({
+                title: '¿Exportar a Excel?',
+                text: "Se generará un reporte detallado con la información actual.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, exportar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // AQUÍ AGREGAMOS LA BARRA DE TIEMPO
+                    Swal.fire({
+                        title: 'Generando archivo...',
+                        html: 'Preparando los datos para la descarga',
+                        timer: 2000, // Tiempo de la barra (2 segundos)
+                        timerProgressBar: true, // Esto activa la "barra de abajo"
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        willClose: () => {
+                            ejecutarExportacion(); // Llama a la descarga al terminar la barra
+                        }
+                    });
+                }
+            });
+        }
+
+        function ejecutarExportacion() {
+            let table = document.getElementById("tablaParticipantes").outerHTML;
+            // Estilo para bordes en Excel
+            let estilo = "<style>table, th, td { border: 1px solid #000; border-collapse: collapse; text-align: center; }</style>";
+            let url = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(estilo + table);
+
             let a = document.createElement('a');
             a.href = url;
-            a.download = 'registros.xls';
+            a.download = 'Reporte_Participantes_IntegraGames.xls';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+
+            Swal.fire({
+                icon: 'success',
+                title: '¡Descarga lista!',
+                showConfirmButton: false,
+                timer: 1500
+            });
         }
     </script>
-    <!-- jQuery -->
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>

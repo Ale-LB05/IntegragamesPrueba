@@ -11,6 +11,10 @@ if (!isset($_SESSION['usuario'])) {
 $usuarioActual = $_SESSION['usuario'];
 $rol = $_SESSION['rol'];
 
+/* --- NUEVO: CAPTURAR MENSAJES DE LA URL --- */
+$mensaje = isset($_GET['msg']) ? $_GET['msg'] : "";
+$tipo = isset($_GET['tipo']) ? $_GET['tipo'] : "";
+
 /* OBTENER USUARIO */
 $sql = "SELECT * FROM responsable WHERE nombre='$usuarioActual'";
 $res = mysqli_query($conn, $sql);
@@ -33,8 +37,13 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
     <?php include("../menu/php/encabezado.php"); ?>
     <link rel="icon" href="../img/logo.png" type="image/png">
     <link href="../css/styles.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        body {
+            background: #eef4ff;
+        }
+
         .perfil-container {
             max-width: 1000px;
             margin: auto;
@@ -44,11 +53,16 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
             display: flex;
             gap: 50px;
             flex-wrap: wrap;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .foto-container {
             position: relative;
             width: 150px;
+            margin: auto;
         }
 
         .perfil-img {
@@ -56,12 +70,19 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
             height: 150px;
             border-radius: 50%;
             object-fit: cover;
+            border: 4px solid #3b82f6;
         }
 
         .btn-foto {
             position: absolute;
             bottom: 5px;
             right: 5px;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .info-box {
@@ -72,51 +93,30 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .info-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
         }
 
         .info-text {
-            max-width: 250px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-weight: 600;
+            color: #4e73df;
         }
 
-        .evento-card {
-            display: flex;
-            align-items: center;
-            background: #fff;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        .bg-primary {
+            background-color: #3b82f6 !important;
         }
 
-        .evento-img {
-            width: 120px;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 15px;
-            margin-right: 15px;
+        .rounded-4 {
+            border-radius: 1rem !important;
         }
 
-        .evento-info {
-            flex: 1;
+        .rounded-top-4 {
+            border-top-left-radius: 1rem !important;
+            border-top-right-radius: 1rem !important;
         }
 
-        .modal-dialog {
-            max-width: 500px;
-        }
-
-        .modal-body {
-            overflow-x: hidden;
+        .fw-bold {
+            font-weight: bold;
         }
 
         .toggle-pass {
@@ -126,272 +126,257 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
             transform: translateY(-50%);
             cursor: pointer;
             z-index: 10;
+            color: #ccc;
         }
 
-        .modal-content {
-            border-radius: 10px;
+        .evento-card {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
 
-        .form-control {
-            box-sizing: border-box;
-        }
-
-        .pr-5 {
-            padding-right: 40px;
-            /* espacio para el ojo */
+        .evento-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-right: 15px;
         }
     </style>
 </head>
 
-<body>
-
+<body id="page-top">
     <div id="wrapper">
-
         <?php include("../menu/php/menuLateral.php"); ?>
-
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-
                 <?php include("../menu/php/barraSuperior.php"); ?>
 
-                <div class="container-fluid perfil-container">
+                <div class="container-fluid perfil-container mt-4">
+                    <h4 class="mb-4 fw-bold text-gray-800">Mi Perfil</h4>
 
-                    <h4 class="mb-4">Perfil</h4>
-
-                    <div class="perfil-box">
-
-                        <!-- FOTO -->
+                    <div class="perfil-box shadow-sm">
                         <div class="text-center">
                             <div class="foto-container">
-                                <img src="<?= $imagen ?>" class="perfil-img">
-
-                                <button class="btn btn-info btn-sm btn-foto"
-                                    data-toggle="modal"
-                                    data-target="#modalFoto">
-                                    <i class="fas fa-edit"></i>
+                                <img src="<?= $imagen ?>" class="perfil-img shadow">
+                                <button class="btn btn-primary btn-foto shadow" data-toggle="modal" data-target="#modalFoto">
+                                    <i class="fas fa-camera"></i>
                                 </button>
                             </div>
-
-                            <div class="mt-2">
-                                <strong><?= htmlspecialchars($user['nombre']) ?></strong>
+                            <div class="mt-3">
+                                <h5 class="fw-bold mb-0"><?= htmlspecialchars($user['nombre']) ?></h5>
+                                <span class="badge px-3 rounded-pill" style="background-color: #b1cfff; color: black;"><?= $rol ?></span>
                             </div>
                         </div>
 
-                        <!-- INFO -->
                         <div class="info-box">
-
-                            <h5>Información</h5>
-
+                            <h5 class="fw-bold text-gray-800 mb-3"><i class="fas fa-info-circle mr-2"></i>Información de cuenta</h5>
                             <div class="info-item">
-                                <span>Correo</span>
-
-                                <div class="info-right">
-                                    <span class="info-text"><?= htmlspecialchars($user['correo']) ?></span>
-
-                                    <button class="btn btn-info btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#modalCorreo">
-                                        <i class="fas fa-edit"></i>
+                                <span><i class="fas fa-envelope mr-2"></i> Correo</span>
+                                <div class="d-flex align-items-center">
+                                    <span class="info-text mr-3"><?= htmlspecialchars($user['correo']) ?></span>
+                                    <button class="btn btn-outline-primary btn-sm rounded-circle" data-toggle="modal" data-target="#modalCorreo">
+                                        <i class="fas fa-pen"></i>
                                     </button>
                                 </div>
                             </div>
 
                             <div class="info-item">
-                                <span>Rol</span>
-                                <span><?= $rol ?></span>
-                            </div>
-
-                            <div class="info-item">
-                                <span>Contraseña</span>
-
-                                <div class="info-right">
-                                    <span class="info-text">********</span>
-
-                                    <button class="btn btn-info btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#modalPass">
-                                        <i class="fas fa-edit"></i>
+                                <span><i class="fas fa-lock mr-2"></i> Contraseña</span>
+                                <div class="d-flex align-items-center">
+                                    <span class="info-text mr-3">********</span>
+                                    <button class="btn btn-outline-primary btn-sm rounded-circle" data-toggle="modal" data-target="#modalPass">
+                                        <i class="fas fa-key"></i>
                                     </button>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
-                    <!-- EVENTOS -->
-                    <h4 class="mt-4 mb-3">Eventos Asistidos</h4>
-
+                    <h4 class="mt-5 mb-3 fw-bold text-gray-800">Actividad Reciente</h4>
                     <?php
                     $sqlEventos = "SELECT * FROM evento ORDER BY fecha DESC LIMIT 3";
                     $resEventos = $conn->query($sqlEventos);
-
                     while ($row = $resEventos->fetch_assoc()) {
-
                         $imgEvento = (!empty($row['imagen']) && file_exists("../img/eventos/" . $row['imagen']))
-                            ? "../img/eventos/" . $row['imagen']
-                            : "../img/default.png";
+                            ? "../img/eventos/" . $row['imagen'] : "../img/default.png";
                     ?>
-
-                        <div class="evento-card">
-                            <img src="<?= $imgEvento ?>" class="evento-img">
-
+                        <div class="evento-card border-left-primary">
+                            <img src="<?= $imgEvento ?>" class="evento-img shadow-sm">
                             <div class="evento-info">
-                                <h6><?= htmlspecialchars($row["nombre_evento"]) ?></h6>
-
+                                <h6 class="fw-bold mb-1"><?= htmlspecialchars($row["nombre_evento"]) ?></h6>
                                 <small class="text-muted">
-                                    Fecha: <?= $row["fecha"] ?><br>
-                                    Lugar: <?= htmlspecialchars($row["lugar"]) ?><br>
-                                    Observaciones: <?= htmlspecialchars($row["observaciones"]) ?>
+                                    <i class="fas fa-calendar-alt mr-1"></i> <?= date("d/m/Y", strtotime($row["fecha"])) ?>
                                 </small>
                             </div>
                         </div>
-
                     <?php } ?>
-
                 </div>
             </div>
-
             <?php include("../menu/php/piePagina.php"); ?>
-
         </div>
     </div>
 
-    <!--  MODALES  -->
-
-    <!-- FOTO -->
     <div class="modal fade" id="modalFoto">
-        <div class="modal-dialog">
-            <form method="POST" action="php/actualizar_perfil.php" enctype="multipart/form-data" class="modal-content">
-
-                <div class="modal-header bg-success text-white">
-                    <h5>Cambiar foto</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" action="php/actualizar_perfil.php" enctype="multipart/form-data" class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0"><i class="fas fa-image mr-2"></i> Actualizar Foto</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
-
                 <div class="modal-body text-center">
-
-                    <img id="previewFoto" src="<?= $imagen ?>" style="width:120px; height:120px; border-radius:50%; margin-bottom:10px;">
-
-                    <input type="file" name="imagen" class="form-control" onchange="previewImagen(event)" required>
-
+                    <img id="previewFoto" src="<?= $imagen ?>" style="width:150px; height:150px; border-radius:50%; object-fit:cover; border:3px solid #eee;" class="mb-3 shadow-sm">
+                    <div class="custom-file text-left">
+                        <input type="file" name="imagen" class="custom-file-input" id="inputFoto" onchange="previewImagen(event)" accept="image/*" required>
+                        <label class="custom-file-label" for="inputFoto">Elegir nueva imagen...</label>
+                    </div>
                     <input type="hidden" name="nombre" value="<?= $user['nombre'] ?>">
-                    <input type="hidden" name="correo" value="<?= $user['correo'] ?>">
-
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-success">Guardar</button>
+                    <button type="submit" class="btn btn-success px-4 rounded-pill shadow-sm">
+                        <i class="fas fa-save mr-2"></i> Guardar Foto
+                    </button>
                 </div>
-
             </form>
         </div>
     </div>
 
-    <!-- CORREO -->
     <div class="modal fade" id="modalCorreo">
-        <div class="modal-dialog">
-            <form method="POST" action="php/actualizar_perfil.php" class="modal-content">
-
-                <div class="modal-header bg-info text-white">
-                    <h5>Editar correo</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" action="php/actualizar_perfil.php" class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0"><i class="fas fa-envelope mr-2"></i> Editar Correo</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
-
                 <div class="modal-body">
-
-                    <label>Correo actual</label>
-                    <input type="text" class="form-control mb-2" value="<?= $user['correo'] ?>" disabled>
-
-                    <label>Nuevo correo</label>
-                    <input type="email" name="correo" class="form-control" required>
-
+                    <label class="fw-bold">Nuevo Correo Electrónico</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-at"></i></span>
+                        </div>
+                        <input type="email" name="correo" class="form-control" placeholder="nuevo@correo.com" required>
+                    </div>
                     <input type="hidden" name="nombre" value="<?= $user['nombre'] ?>">
-
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-info">Guardar</button>
+                    <button type="submit" class="btn btn-success px-4 rounded-pill shadow-sm">
+                        <i class="fas fa-save mr-2"></i> Actualizar Correo
+                    </button>
                 </div>
-
             </form>
         </div>
     </div>
 
-    <!-- PASSWORD -->
     <div class="modal fade" id="modalPass">
-        <div class="modal-dialog">
-            <form method="POST" action="php/actualizar_perfil.php" class="modal-content">
-
-                <div class="modal-header bg-info text-white">
-                    <h5>Cambiar contraseña</h5>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" action="php/actualizar_perfil.php" id="formPass" class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0"><i class="fas fa-lock mr-2"></i> Seguridad de la Cuenta</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
-
                 <div class="modal-body">
+                    <label class="fw-bold">Contraseña Actual</label>
                     <div class="position-relative mb-3">
-                        <input type="password" name="actual" class="form-control pr-5" placeholder="Contraseña actual" required>
-
-                        <span class="toggle-pass">
-                            <i class="fa fa-eye"></i>
-                        </span>
+                        <input type="password" name="actual" class="form-control pr-5" placeholder="Escribe tu contraseña actual" required>
+                        <span class="toggle-pass"><i class="fa fa-eye"></i></span>
                     </div>
-
+                    <label class="fw-bold">Nueva Contraseña</label>
                     <div class="position-relative mb-3">
-                        <input type="password" name="password" class="form-control pr-5" placeholder="Nueva contraseña">
-
-                        <span class="toggle-pass">
-                            <i class="fa fa-eye"></i>
-                        </span>
+                        <input type="password" name="password" id="newPass" class="form-control pr-5" placeholder="Mínimo 6 caracteres" required>
+                        <span class="toggle-pass"><i class="fa fa-eye"></i></span>
                     </div>
-
+                    <label class="fw-bold">Confirmar Nueva Contraseña</label>
+                    <div class="position-relative">
+                        <input type="password" id="confirmPass" class="form-control pr-5" placeholder="Repite la nueva contraseña" required>
+                        <span class="toggle-pass"><i class="fa fa-eye"></i></span>
+                    </div>
                     <input type="hidden" name="nombre" value="<?= $user['nombre'] ?>">
-                    <input type="hidden" name="correo" value="<?= $user['correo'] ?>">
-
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button class="btn btn-info">Guardar</button>
+                    <button type="submit" class="btn btn-success px-4 rounded-pill shadow-sm">
+                        <i class="fas fa-save mr-2"></i> Cambiar Contraseña
+                    </button>
                 </div>
-
             </form>
         </div>
     </div>
 
-    <!-- SCRIPTS -->
-    <!-- SCRIPTS -->
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
     <script src="../js/sb-admin-2.min.js"></script>
 
     <script>
+        $(document).ready(function() {
+            // MOSTRAR CONFIRMACIÓN
+            <?php if (!empty($mensaje)) : ?>
+                Swal.fire({
+                    icon: '<?= $tipo ?>',
+                    title: '<?= $mensaje ?>',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    // Limpia la URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                });
+            <?php endif; ?>
+
+            // VALIDACIÓN ANTES DE ENVIAR
+            $('form').on('submit', function(e) {
+                if (this.id === 'formPass') {
+                    const p1 = $('#newPass').val();
+                    const p2 = $('#confirmPass').val();
+
+                    if (p1 !== p2) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Las contraseñas no coinciden',
+                            text: 'Por favor, verifica que ambos campos sean iguales.'
+                        });
+                        return false;
+                    }
+
+                    if (p1.length < 6) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Contraseña muy corta',
+                            text: 'La nueva contraseña debe tener al menos 6 caracteres.'
+                        });
+                        return false;
+                    }
+                }
+            });
+        });
+
+        // Previsualizar Imagen
         function previewImagen(event) {
+            const file = event.target.files[0];
+            if (file && file.size > 2000000) {
+                Swal.fire('Error', 'La imagen es muy pesada (máx 2MB)', 'error');
+                event.target.value = '';
+                return;
+            }
             const reader = new FileReader();
             reader.onload = e => document.getElementById('previewFoto').src = e.target.result;
-            reader.readAsDataURL(event.target.files[0]);
+            reader.readAsDataURL(file);
         }
 
+        // Mostrar/Ocultar Pass
         document.querySelectorAll(".toggle-pass").forEach(icon => {
             icon.addEventListener("click", function() {
                 let input = this.parentElement.querySelector("input");
                 let i = this.querySelector("i");
-
-                if (input.type === "password") {
-                    input.type = "text";
-                    i.classList.remove("fa-eye");
-                    i.classList.add("fa-eye-slash");
-                } else {
-                    input.type = "password";
-                    i.classList.remove("fa-eye-slash");
-                    i.classList.add("fa-eye");
-                }
+                input.type = input.type === "password" ? "text" : "password";
+                i.classList.toggle("fa-eye");
+                i.classList.toggle("fa-eye-slash");
             });
         });
     </script>
-
 </body>
 
 </html>
