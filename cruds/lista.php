@@ -10,22 +10,22 @@ if (!isset($_SESSION['usuario'])) {
 
 $rol = $_SESSION['rol'];
 
-/* CONSULTA */
+/* CONSULTA ACTUALIZADA:*/
 $sql = "SELECT 
-p.nombre,
-p.edad,
-e.nombre_evento,
-esc.nombre_escuela,
-r.tipo_juego,
-r.puntaje,
-r.fecha,
-s.calificacion,
-s.comentario
+    p.nombre,
+    p.edad,
+    e.nombre_evento,
+    esc.nombre_escuela,
+    j.nombre_juego AS juego,
+    s.fecha,
+    s.calificacion,
+    s.comentario
 FROM participante p
 LEFT JOIN evento e ON p.id_evento = e.id_evento
 LEFT JOIN escuela esc ON p.id_escuela = esc.id_escuela
-LEFT JOIN resultado r ON p.id_participante = r.id_participante
-LEFT JOIN satisfaccion s ON p.id_participante = s.id_participante";
+LEFT JOIN satisfaccion s ON p.id_participante = s.id_participante
+LEFT JOIN juego j ON s.id_juego = j.id_juego
+ORDER BY s.fecha DESC";
 
 $res = $conn->query($sql);
 ?>
@@ -55,8 +55,18 @@ $res = $conn->query($sql);
         }
 
         .card {
-            border-radius: 18px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+            transform: none !important;
+            border: none !important;
+            background: #ffffff;
+            border-radius: 20px !important;
+            /* Más redondeado para verse moderno */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .card:hover {
+            transform: none !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
         }
 
         .table thead {
@@ -87,20 +97,14 @@ $res = $conn->query($sql);
 </head>
 
 <body id="page-top">
-
     <div id="wrapper">
-
         <?php include("../menu/php/menuLateral.php"); ?>
-
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-
                 <?php include("../menu/php/barraSuperior.php"); ?>
-
                 <div class="container-fluid">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
                         <h1 class="h3 text-gray-800 mb-2">Registros de Participantes</h1>
-
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div class="input-group mr-2 mb-2" style="width: 400px;">
                                 <div class="input-group-prepend">
@@ -108,7 +112,6 @@ $res = $conn->query($sql);
                                 </div>
                                 <input type="text" id="buscador" class="form-control" placeholder="Buscar participante...">
                             </div>
-
                             <button onclick="confirmarExportacion()" class="btn btn-success mb-2">
                                 <i class="fas fa-file-excel"></i> Exportar a Excel
                             </button>
@@ -117,7 +120,6 @@ $res = $conn->query($sql);
 
                     <div class="card p-3 shadow">
                         <p><strong>Total de registros:</strong> <?= $res->num_rows ?></p>
-
                         <div class="table-responsive">
                             <table class="table table-bordered text-center" id="tablaParticipantes">
                                 <thead>
@@ -127,8 +129,7 @@ $res = $conn->query($sql);
                                         <th>Evento</th>
                                         <th>Escuela</th>
                                         <th>Juego</th>
-                                        <th>Puntaje</th>
-                                        <th>Fecha</th>
+                                        <th>Fecha Encuesta</th>
                                         <th>Calificación</th>
                                         <th>Comentario</th>
                                     </tr>
@@ -136,7 +137,7 @@ $res = $conn->query($sql);
                                 <tbody>
                                     <?php if ($res->num_rows == 0) : ?>
                                         <tr>
-                                            <td colspan="9">No hay registros</td>
+                                            <td colspan="8">No hay registros</td>
                                         </tr>
                                     <?php endif; ?>
 
@@ -146,15 +147,14 @@ $res = $conn->query($sql);
                                             <td><?= $row['edad'] ?></td>
                                             <td><?= htmlspecialchars($row['nombre_evento'] ?? '-') ?></td>
                                             <td><?= htmlspecialchars($row['nombre_escuela'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($row['tipo_juego'] ?? '-') ?></td>
-                                            <td><strong><?= $row['puntaje'] ?? '-' ?></strong></td>
+                                            <td><?= htmlspecialchars($row['juego'] ?? '-') ?></td>
                                             <td><?= $row['fecha'] ? date("d/m/Y", strtotime($row['fecha'])) : '-' ?></td>
                                             <td>
                                                 <?php
                                                 $cal = $row['calificacion'];
-                                                if ($cal >= 8) echo "<span class='badge badge-success'>$cal</span>";
-                                                elseif ($cal >= 5) echo "<span class='badge badge-warning'>$cal</span>";
-                                                elseif ($cal !== null) echo "<span class='badge badge-danger'>$cal</span>";
+                                                if ($cal >= 4) echo "<span class='badge badge-success'>$cal ★</span>";
+                                                elseif ($cal == 3) echo "<span class='badge badge-warning'>$cal ★</span>";
+                                                elseif ($cal !== null) echo "<span class='badge badge-danger'>$cal ★</span>";
                                                 else echo "-";
                                                 ?>
                                             </td>
@@ -167,9 +167,7 @@ $res = $conn->query($sql);
                     </div>
                 </div>
             </div>
-
             <?php include("../menu/php/piePagina.php"); ?>
-
         </div>
     </div>
 
@@ -187,7 +185,7 @@ $res = $conn->query($sql);
         function confirmarExportacion() {
             Swal.fire({
                 title: '¿Exportar a Excel?',
-                text: "Se generará un reporte detallado con la información actual.",
+                text: "Se generará un reporte con la satisfacción de los alumnos.",
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#28a745',
@@ -196,18 +194,15 @@ $res = $conn->query($sql);
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // AQUÍ AGREGAMOS LA BARRA DE TIEMPO
                     Swal.fire({
                         title: 'Generando archivo...',
-                        html: 'Preparando los datos para la descarga',
-                        timer: 2000, // Tiempo de la barra (2 segundos)
-                        timerProgressBar: true, // Esto activa la "barra de abajo"
-                        allowOutsideClick: false,
+                        timer: 2000,
+                        timerProgressBar: true,
                         didOpen: () => {
                             Swal.showLoading();
                         },
                         willClose: () => {
-                            ejecutarExportacion(); // Llama a la descarga al terminar la barra
+                            ejecutarExportacion();
                         }
                     });
                 }
@@ -216,23 +211,14 @@ $res = $conn->query($sql);
 
         function ejecutarExportacion() {
             let table = document.getElementById("tablaParticipantes").outerHTML;
-            // Estilo para bordes en Excel
             let estilo = "<style>table, th, td { border: 1px solid #000; border-collapse: collapse; text-align: center; }</style>";
             let url = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(estilo + table);
-
             let a = document.createElement('a');
             a.href = url;
-            a.download = 'Reporte_Participantes_IntegraGames.xls';
+            a.download = 'Reporte_Satisfaccion_IntegraGames.xls';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-
-            Swal.fire({
-                icon: 'success',
-                title: '¡Descarga lista!',
-                showConfirmButton: false,
-                timer: 1500
-            });
         }
     </script>
 
@@ -240,7 +226,6 @@ $res = $conn->query($sql);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
-
 </body>
 
 </html>

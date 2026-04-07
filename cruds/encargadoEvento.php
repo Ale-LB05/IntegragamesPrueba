@@ -50,10 +50,18 @@ $res = $conn->query($sql);
             color: #1e3a8a;
             font-weight: bold;
         }
-
         .card {
-            border-radius: 18px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+            transform: none !important;
+            border: none !important;
+            background: #ffffff;
+            border-radius: 20px !important; /* Más redondeado para verse moderno */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .card:hover {
+            transform: none !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
         }
 
         .table thead {

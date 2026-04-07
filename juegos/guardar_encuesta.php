@@ -2,38 +2,35 @@
 session_start();
 require_once "../config/conexion.php";
 
+/* Verificar sesión */
 if (!isset($_SESSION['usuario'])) {
     header("Location: ../RegistroAdmin/login.php");
     exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Recoger datos del formulario
+    // Recoger datos 
     $calificacion = $_POST['calificacion'];
     $comentario = $_POST['comentario'];
-    $id_juego = $_POST['id_juego'];
-
-    // Obtener el ID del participante desde la sesión 
-    // (Asegúrate de que 'id_usuario' sea la clave correcta en tu sesión)
+    $id_juego = intval($_POST['id_juego']); // Forzamos que sea un número
     $id_participante = $_SESSION['id_usuario'] ?? null;
+    $fecha_actual = date("Y-m-d");
 
-    // Preparar la consulta para evitar errores de FK y SQL
-    $stmt = $conexion->prepare("INSERT INTO satisfaccion (calificacion, comentario, id_participante, id_juego) VALUES (?, ?, ?, ?)");
+    // Validar que el participante existe para evitar el error de FK
+    if ($id_participante && $id_juego > 0) {
+        // Insertar en la base de datos
+        $stmt = $conn->prepare("INSERT INTO satisfaccion (calificacion, comentario, fecha, id_participante, id_juego) VALUES (?, ?, ?, ?, ?)");
+        $stmt->bind_param("issii", $calificacion, $comentario, $fecha_actual, $id_participante, $id_juego);
 
-    $stmt->bind_param("issi", $calificacion, $comentario, $id_participante, $id_juego);
-
-    if ($stmt->execute()) {
-        echo "<script>
-                alert('¡Gracias por tu opinión!');
-                window.location.href='../menu/menu.php';
-              </script>";
+        if ($stmt->execute()) {
+            // Éxito: Redirigir al menú 
+            header("Location: ../menu/menu.php");
+            exit();
+        } else {
+            echo "Error de ejecución: " . $stmt->error;
+        }
+        $stmt->close();
     } else {
-        // Si sale error aquí, es porque el id_juego o id_participante no existen en sus tablas originales
-        echo "Error al guardar: " . $stmt->error;
+        echo "Error: Datos de sesión o juego no encontrados.";
     }
-
-    $stmt->close();
-    $conexion->close();
-} else {
-    header("Location: encuesta.php");
 }

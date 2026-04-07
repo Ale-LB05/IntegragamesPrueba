@@ -3,7 +3,7 @@ session_start();
 session_destroy();
 require_once "../config/conexion.php";
 $escuelas = $conn->query("SELECT * FROM escuela");
-// Consulta filtrada: Solo eventos con la fecha de HOY
+// Consulta filtrada: Solo eventos con la fecha de HOY [cite: 2572]
 $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
 ?>
 
@@ -11,117 +11,197 @@ $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
 <html lang="es">
 
 <head>
-    <!-- ICONO -->
-    <link rel="icon" href="../img/logo.png" type="image/png">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Registro Alumno - IntegraGames</title>
+    <title>Registro Alumno | IntegraGames</title>
+    <link rel="icon" href="../img/logo.png" type="image/png">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #1e3c72, #2a5298);
+            --accent-color: #00d2ff;
+            --accent-hover: #0072ff;
+        }
+
         body {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            height: 100vh;
+            background: var(--primary-gradient);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Elemento decorativo de fondo */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            background: rgba(0, 210, 255, 0.15);
+            border-radius: 50%;
+            top: -50px;
+            right: -50px;
+            z-index: -1;
+            filter: blur(80px);
         }
 
         .card {
-            border: none;
-            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.98);
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Efecto de sombra profesional sin "brincos" */
+        .card:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
+            border-color: var(--accent-color);
+        }
+
+        .header-title h3 {
+            font-weight: 700;
+            color: #1e3c72;
+            margin-top: 10px;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            color: #495057;
+        }
+
+        /* Estilo de inputs con iconos */
+        .input-group-text {
+            background-color: transparent;
+            color: #2a5298;
+            border-right: none;
+        }
+
+        .form-control,
+        .form-select {
+            border-left: none;
+            padding: 10px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: none;
+            border-color: var(--accent-color);
+        }
+
+        .input-group:focus-within .input-group-text,
+        .input-group:focus-within .form-control,
+        .input-group:focus-within .form-select {
+            border-color: var(--accent-color);
         }
 
         .btn-primary {
-            background: #00c6ff;
+            background: linear-gradient(to right, var(--accent-color), var(--accent-hover));
             border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
         }
 
         .btn-primary:hover {
-            background: #0072ff;
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
+        }
+
+        .back-link {
+            color: #6c757d;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--accent-hover);
         }
     </style>
-
 </head>
 
 <body>
 
     <div class="container">
-
         <div class="row justify-content-center">
-
-            <div class="col-md-6">
-
+            <div class="col-md-6 col-lg-5">
                 <div class="card shadow-lg">
-
-                    <div class="card-body p-5">
-
-                        <div class="text-center mb-4">
-                            <h3 class="mt-2">Registro de Alumno</h3>
-
-                            <p class="text-muted">IntegraGames</p>
-
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4 header-title">
+                            <img src="../img/logo.png" alt="Logo" style="height: 70px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                            <h3>Registro de Alumno</h3>
+                            <p class="text-muted small">¡Bienvenido a IntegraGames!</p>
                         </div>
+
                         <form action="guardar_alumno.php" method="POST">
-
-                            <!-- NOMBRE -->
                             <div class="mb-3">
-                                <label class="form-label">Nombre</label>
-                                <input type="text"
-                                    class="form-control"
-                                    name="nombre"
-                                    required>
+                                <label class="form-label fw-bold">Nombre Completo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control" name="nombre" placeholder="Tu nombre" required>
+                                </div>
                             </div>
 
-                            <!-- EDAD -->
                             <div class="mb-3">
-                                <label class="form-label">Edad</label>
-                                <input type="number"
-                                    class="form-control"
-                                    name="edad"
-                                    required>
-
+                                <label class="form-label fw-bold">Edad</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
+                                    <input type="number" class="form-control" name="edad" placeholder="¿Cuántos años tienes?" required>
+                                </div>
                             </div>
 
-                            <!-- ESCUELA -->
                             <div class="mb-3">
-                                <label class="form-label">Escuela</label>
-                                <select class="form-control" name="id_escuela" required>
-                                    <option value="">Selecciona una escuela</option>
-                                    <?php while ($escuela = $escuelas->fetch_assoc()) { ?>
-                                        <option value="<?php echo $escuela['id_escuela']; ?>">
-                                            <?php echo $escuela['nombre_escuela']; ?>
-                                        </option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-
-                            <!-- EVENTO -->
-                            <div class="mb-3">
-                                <label class="form-label">Evento</label>
-                                <select class="form-control" name="id_evento" required>
-                                    <?php if ($eventos->num_rows > 0) { ?>
-                                        <option value="">Selecciona el evento</option>
-                                        <?php while ($evento = $eventos->fetch_assoc()) { ?>
-                                            <option value="<?php echo $evento['id_evento']; ?>">
-                                                <?php echo $evento['nombre_evento']; ?>
+                                <label class="form-label fw-bold">Escuela de Procedencia</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-school"></i></span>
+                                    <select class="form-select" name="id_escuela" required>
+                                        <option value="">Selecciona tu escuela</option>
+                                        <?php while ($escuela = $escuelas->fetch_assoc()) { ?>
+                                            <option value="<?php echo $escuela['id_escuela']; ?>">
+                                                <?php echo $escuela['nombre_escuela']; ?>
                                             </option>
                                         <?php } ?>
-                                    <?php } else { ?>
-                                        <option value="">No hay eventos programados para hoy</option>
-                                    <?php } ?>
-                                </select>
+                                    </select>
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">
 
-                                <i class="fa-solid fa-user-plus"></i> Registrarme
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Evento del Día</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-trophy"></i></span>
+                                    <select class="form-select" name="id_evento" required>
+                                        <?php if ($eventos->num_rows > 0) { ?>
+                                            <option value="">Selecciona el evento</option>
+                                            <?php while ($evento = $eventos->fetch_assoc()) { ?>
+                                                <option value="<?php echo $evento['id_evento']; ?>">
+                                                    <?php echo $evento['nombre_evento']; ?>
+                                                </option>
+                                            <?php } ?>
+                                        <?php } else { ?>
+                                            <option value="">No hay eventos programados hoy</option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3">
+                                <i class="fa-solid fa-user-plus me-2"></i> Ingresar
                             </button>
                         </form>
-                        <hr>
+
+                        <hr class="opacity-25">
                         <div class="text-center">
-                            <a href="../index.php">
-                                <i class="fa-solid fa-arrow-left"></i> Volver al inicio
+                            <a href="../index.php" class="back-link text-decoration-none">
+                                <i class="fa-solid fa-arrow-left me-1"></i> Volver al inicio
                             </a>
                         </div>
                     </div>
@@ -129,6 +209,7 @@ $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
             </div>
         </div>
     </div>
+
 </body>
 
 </html>
