@@ -15,7 +15,7 @@ $tipo = "";
 /* INSERTAR */
 if (isset($_POST['guardar'])) {
     $nombre = $conn->real_escape_string($_POST['nombre']);
-    $contacto = $conn->real_escape_string($_POST['contacto']); // Nuevo campo
+    $contacto = $conn->real_escape_string($_POST['contacto']);
     $direccion = $conn->real_escape_string($_POST['direccion']);
 
     $temp_tel = preg_replace('/[^0-9]/', '', $_POST['telefono']);
@@ -26,7 +26,6 @@ if (isset($_POST['guardar'])) {
     } else {
         $telefono = substr($temp_tel, 0, 3) . " " . substr($temp_tel, 3, 3) . " " . substr($temp_tel, 6);
 
-        // Ajuste: agregamos 'contacto' a la consulta
         $stmt = $conn->prepare("INSERT INTO escuela(nombre_escuela, contacto, direccion, telefono) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $nombre, $contacto, $direccion, $telefono);
         if ($stmt->execute()) {
@@ -43,7 +42,7 @@ if (isset($_POST['guardar'])) {
 if (isset($_POST['actualizar'])) {
     $id = intval($_POST['id']);
     $nombre = $conn->real_escape_string($_POST['nombre']);
-    $contacto = $conn->real_escape_string($_POST['contacto']); // Nuevo campo
+    $contacto = $conn->real_escape_string($_POST['contacto']);
     $direccion = $conn->real_escape_string($_POST['direccion']);
 
     $temp_tel = preg_replace('/[^0-9]/', '', $_POST['telefono']);
@@ -54,7 +53,6 @@ if (isset($_POST['actualizar'])) {
     } else {
         $telefono = substr($temp_tel, 0, 3) . " " . substr($temp_tel, 3, 3) . " " . substr($temp_tel, 6);
 
-        // Ajuste: actualizamos también el campo 'contacto'
         $stmt = $conn->prepare("UPDATE escuela SET nombre_escuela=?, contacto=?, direccion=?, telefono=? WHERE id_escuela=?");
         $stmt->bind_param("ssssi", $nombre, $contacto, $direccion, $telefono, $id);
         if ($stmt->execute()) {
@@ -81,27 +79,30 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
+        body {
+            background: #eef4ff;
+        }
+        .text-primary { color: #4e73df !important; }
+        .text-secondary { color: #858796 !important; }
+
+        .bg-primary {
+            background-color: #4e73df !important;
+        }
+
+        /* Azul SB Admin */
+
         .card {
             transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
             transform: none !important;
             border: none !important;
             background: #ffffff;
             border-radius: 20px !important;
-            /* Más redondeado para verse moderno */
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
         }
 
         .card:hover {
             transform: none !important;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
-        }
-
-        body {
-            background: #eef4ff;
-        }
-
-        .bg-primary {
-            background-color: #3b82f6 !important;
         }
 
         .rounded-4 {
@@ -117,9 +118,20 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
             font-weight: bold;
         }
 
+        /* Mejoras en la tabla */
         .table thead {
-            background: #3b82f6;
+            background: #4e73df;
             color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .table th,
+        .table td {
+            vertical-align: middle !important;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fc;
         }
     </style>
 </head>
@@ -137,12 +149,12 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                         <div class="d-flex align-items-center flex-wrap">
                             <div class="input-group mr-2 mb-2" style="width: 400px;">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                                    <span class="input-group-text bg-white"><i class="fas fa-search text-primary"></i></span>
                                 </div>
-                                <input type="text" id="buscador" class="form-control" placeholder="Buscar escuela...">
+                                <input type="text" id="buscador" class="form-control border-left-0" placeholder="Buscar escuela...">
                             </div>
-                            <button class="btn btn-success mb-2" data-toggle="modal" data-target="#modalAgregar">
-                                <i class="fas fa-plus"></i> Nueva Escuela
+                            <button class="btn btn-success mb-2 shadow-sm" data-toggle="modal" data-target="#modalAgregar">
+                                <i class="fas fa-plus mr-1"></i> Nueva Escuela
                             </button>
                         </div>
                     </div>
@@ -153,8 +165,8 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                                 <table class="table table-bordered text-center" id="tablaEscuelas">
                                     <thead>
                                         <tr>
-                                            <th>Nombre</th>
-                                            <th>Contacto</th>
+                                            <th>Nombre de la Escuela</th>
+                                            <th>Contacto Directo</th>
                                             <th>Dirección</th>
                                             <th>Teléfono</th>
                                             <th>Acciones</th>
@@ -163,27 +175,45 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                                     <tbody>
                                         <?php if ($res->num_rows == 0) : ?>
                                             <tr>
-                                                <td colspan="5">No hay registros</td>
+                                                <td colspan="5" class="py-4 text-muted">
+                                                    <i class="fas fa-school fa-2x mb-2" style="color: #cbd5e1;"></i><br>
+                                                    Aún no hay escuelas registradas
+                                                </td>
                                             </tr>
                                         <?php endif; ?>
                                         <?php while ($row = $res->fetch_assoc()) : ?>
                                             <tr>
-                                                <td><?= htmlspecialchars($row['nombre_escuela']) ?></td>
-                                                <td><?= htmlspecialchars($row['contacto']) ?></td>
-                                                <td><?= htmlspecialchars($row['direccion']) ?></td>
-                                                <td><?= $row['telefono'] ?></td>
-                                                <td>
-                                                    <button class="btn btn-info btn-sm"
+                                                <td class="align-middle fw-bold text-dark text-light pl-4">
+                                                    <?= htmlspecialchars($row['nombre_escuela']) ?>
+                                                </td>
+
+                                                <td class="align-middle text-secondary">
+                                                    <?= htmlspecialchars($row['contacto']) ?>
+                                                </td>
+
+                                                <td class="align-middle text-muted">
+                                                    <small><?= htmlspecialchars($row['direccion']) ?></small>
+                                                </td>
+
+                                                <td class="align-middle">
+                                                    <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" style="font-weight: 500; font-size: 0.85rem;">
+                                                        <?= $row['telefono'] ?>
+                                                    </span>
+                                                </td>
+
+                                                <td class="align-middle">
+                                                    <button class="btn btn-info btn-sm shadow-sm rounded-pill px-3"
                                                         data-toggle="modal"
                                                         data-target="#modalEditar"
+                                                        title="Editar datos de la escuela"
                                                         onclick="editarEscuela(
-                                                            '<?= $row['id_escuela'] ?>',
-                                                            '<?= htmlspecialchars($row['nombre_escuela'], ENT_QUOTES) ?>',
-                                                            '<?= htmlspecialchars($row['contacto'], ENT_QUOTES) ?>',
-                                                            '<?= htmlspecialchars($row['direccion'], ENT_QUOTES) ?>',
-                                                            '<?= $row['telefono'] ?>'
-                                                        )">
-                                                        <i class="fas fa-edit"></i> Editar
+                                                        '<?= $row['id_escuela'] ?>',
+                                                        '<?= htmlspecialchars($row['nombre_escuela'], ENT_QUOTES) ?>',
+                                                        '<?= htmlspecialchars($row['contacto'], ENT_QUOTES) ?>',
+                                                        '<?= htmlspecialchars($row['direccion'], ENT_QUOTES) ?>',
+                                                        '<?= $row['telefono'] ?>'
+                                                    )">
+                                                        <i class="fas fa-edit"></i>
                                                     </button>
                                                 </td>
                                             </tr>
@@ -199,86 +229,113 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
         </div>
     </div>
 
-    <div class="modal fade" id="modalAgregar">
+    <div class="modal fade" id="modalAgregar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form method="POST" class="modal-content shadow-lg border-0 rounded-4">
+
                 <div class="modal-header bg-primary text-white rounded-top-4">
-                    <h5 class="mb-0"><i class="fas fa-school"></i> Nueva Escuela</h5>
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-school mr-2"></i> Nueva Escuela</h5>
                     <button type="button" class="close text-white" data-dismiss="modal">×</button>
                 </div>
-                <div class="modal-body">
-                    <label class="fw-bold">Nombre de la Escuela</label>
+
+                <div class="modal-body p-4">
+
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-building mr-1"></i> Datos de la Institución
+                    </h6>
+
+                    <label class="fw-bold text-muted small">Nombre de la Escuela</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-university"></i></span>
-                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Escuela Benito Juárez" required>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-university"></i></span>
+                        <input type="text" name="nombre" class="form-control border-left-0" placeholder="Ej: Preparatoria Benito Juárez" required>
                     </div>
 
-                    <label class="fw-bold">Persona de Contacto</label>
+                    <label class="fw-bold text-muted small">Dirección Física</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" name="contacto" class="form-control" placeholder="Nombre del director o encargado" required>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-map-marker-alt"></i></span>
+                        <textarea name="direccion" class="form-control border-left-0" rows="2" placeholder="Calle, Número, Colonia, Municipio" required></textarea>
                     </div>
 
-                    <label class="fw-bold">Dirección</label>
+                    <h6 class="fw-bold mb-3 mt-4 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-address-book mr-1"></i> Información de Contacto
+                    </h6>
+
+                    <label class="fw-bold text-muted small">Nombre del Director o Encargado</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                        <textarea name="direccion" class="form-control" rows="2" placeholder="Calle, Número, Colonia" required></textarea>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user-tie"></i></span>
+                        <input type="text" name="contacto" class="form-control border-left-0" placeholder="Ej: Mtro. Juan Pérez" required>
                     </div>
 
-                    <label class="fw-bold">Teléfono (10 dígitos)</label>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                        <input type="text" name="telefono" class="form-control input-telefono" maxlength="12" placeholder="443 325 2165" required>
+                    <label class="fw-bold text-muted small">Teléfono (10 dígitos)</label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-phone"></i></span>
+                        <input type="text" name="telefono" class="form-control input-telefono border-left-0" maxlength="12" placeholder="Ej: 443 325 2165" required>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" name="guardar" class="btn btn-success px-4 rounded-pill">
-                        <i class="fas fa-save"></i> Guardar
+
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-outline-danger px-4 rounded-pill" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="guardar" class="btn btn-success fw-bold text-white px-4 rounded-pill shadow-sm">
+                        <i class="fas fa-save mr-2"></i> Guardar Escuela
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
 
-    <div class="modal fade" id="modalEditar">
+    <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form method="POST" class="modal-content shadow-lg border-0 rounded-4">
+
                 <div class="modal-header bg-primary text-white rounded-top-4">
-                    <h5 class="mb-0"><i class="fas fa-edit"></i> Editar Escuela</h5>
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-edit mr-2"></i> Editar Escuela</h5>
                     <button type="button" class="close text-white" data-dismiss="modal">×</button>
                 </div>
-                <div class="modal-body">
+
+                <div class="modal-body p-4">
                     <input type="hidden" name="id" id="editId">
 
-                    <label class="fw-bold">Nombre de la Escuela</label>
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-building mr-1"></i> Datos de la Institución
+                    </h6>
+
+                    <label class="fw-bold text-muted small">Nombre de la Escuela</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-university"></i></span>
-                        <input type="text" name="nombre" id="editNombre" class="form-control" required>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-university"></i></span>
+                        <input type="text" name="nombre" id="editNombre" class="form-control border-left-0" required>
                     </div>
 
-                    <label class="fw-bold">Persona de Contacto</label>
+                    <label class="fw-bold text-muted small">Dirección Física</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" name="contacto" id="editContacto" class="form-control" required>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-map-marker-alt"></i></span>
+                        <textarea name="direccion" id="editDireccion" class="form-control border-left-0" rows="2" required></textarea>
                     </div>
 
-                    <label class="fw-bold">Dirección</label>
+                    <h6 class="fw-bold mb-3 mt-4 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-address-book mr-1"></i> Información de Contacto
+                    </h6>
+
+                    <label class="fw-bold text-muted small">Nombre del Director o Encargado</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                        <textarea name="direccion" id="editDireccion" class="form-control" rows="2" required></textarea>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user-tie"></i></span>
+                        <input type="text" name="contacto" id="editContacto" class="form-control border-left-0" required>
                     </div>
 
-                    <label class="fw-bold">Teléfono</label>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                        <input type="text" name="telefono" id="editTelefono" class="form-control input-telefono" maxlength="12" required>
+                    <label class="fw-bold text-muted small">Teléfono</label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-phone"></i></span>
+                        <input type="text" name="telefono" id="editTelefono" class="form-control input-telefono border-left-0" maxlength="12" required>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" name="actualizar" class="btn btn-info px-4 rounded-pill">
-                        <i class="fas fa-save"></i> Guardar cambios
+
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-outline-danger px-4 rounded-pill" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="actualizar" class="btn btn-info fw-bold text-white px-4 rounded-pill shadow-sm">
+                        <i class="fas fa-save mr-2"></i> Guardar Cambios
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
@@ -288,7 +345,6 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
     <script src="../js/sb-admin-2.min.js"></script>
 
     <script>
-        // Actualizada para recibir 5 parámetros
         function editarEscuela(id, nombre, contacto, direccion, telefono) {
             document.getElementById('editId').value = id;
             document.getElementById('editNombre').value = nombre;
@@ -297,6 +353,7 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
             document.getElementById('editTelefono').value = telefono;
         }
 
+        // Formateo del teléfono a medida que se escribe (Ej: 443 123 4567)
         document.querySelectorAll('.input-telefono').forEach(input => {
             input.addEventListener('input', function(e) {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
@@ -311,6 +368,8 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                     title: '<?= $mensaje ?>',
                     showConfirmButton: false,
                     timer: 2000
+                }).then(() => {
+                    window.history.replaceState({}, document.title, window.location.pathname);
                 });
             <?php endif; ?>
 

@@ -10,7 +10,7 @@ if (!isset($_SESSION['usuario'])) {
 
 $rol = $_SESSION['rol'];
 
-/* CONSULTA ACTUALIZADA:*/
+/* CONSULTA ACTUALIZADA */
 $sql = "SELECT 
     p.nombre,
     p.edad,
@@ -46,12 +46,13 @@ $res = $conn->query($sql);
     <style>
         body {
             background: #eef4ff;
-            font-family: 'Segoe UI';
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        .text-primary { color: #4e73df !important; }
+        .text-secondary { color: #858796 !important; }
 
-        h1 {
-            color: #1e3a8a;
-            font-weight: bold;
+        .bg-primary {
+            background-color: #4e73df !important;
         }
 
         .card {
@@ -60,38 +61,54 @@ $res = $conn->query($sql);
             border: none !important;
             background: #ffffff;
             border-radius: 20px !important;
-            /* Más redondeado para verse moderno */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
         }
 
         .card:hover {
-            transform: none !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
         }
 
-        .table thead {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .table tbody tr:hover {
-            background: #e0ecff;
-        }
-
-        table {
-            border-radius: 10px;
+        /* Estilos de Tabla Premium */
+        .table-responsive {
+            border-radius: 15px;
             overflow: hidden;
         }
 
-        thead th {
-            text-transform: uppercase;
-            font-size: 11px;
-            vertical-align: middle !important;
+        .table thead {
+            background: #4e73df;
+            color: white;
+            border-bottom: none;
         }
 
-        tbody td {
+        .table thead th {
+            font-size: 0.80rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            border: none;
+            padding: 15px;
             vertical-align: middle;
-            font-size: 14px;
+        }
+
+        .table tbody tr {
+            border-bottom: 1px solid #f1f3f5;
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fc;
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+            border: none;
+            padding: 12px 15px;
+            color: #5a5c69;
+            font-size: 0.9rem;
+        }
+
+        .rounded-pill {
+            border-radius: 50rem !important;
         }
     </style>
 </head>
@@ -102,63 +119,106 @@ $res = $conn->query($sql);
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
                 <?php include("../menu/php/barraSuperior.php"); ?>
+
                 <div class="container-fluid">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-                        <h1 class="h3 text-gray-800 mb-2">Registros de Participantes</h1>
+                        <h1 class="h3 text-gray-800 mb-2 fw-bold">
+                            <i class="fas mr-2" "></i> Registros de Participantes
+                        </h1>
+
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="input-group mr-2 mb-2" style="width: 400px;">
+                            <div class="input-group mr-3 mb-2" style="width: 350px;">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                                    <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-primary"></i></span>
                                 </div>
-                                <input type="text" id="buscador" class="form-control" placeholder="Buscar participante...">
+                                <input type="text" id="buscador" class="form-control border-left-0" placeholder="Buscar participante, evento o escuela...">
                             </div>
-                            <button onclick="confirmarExportacion()" class="btn btn-success mb-2">
-                                <i class="fas fa-file-excel"></i> Exportar a Excel
+
+                            <button onclick="confirmarExportacion()" class="btn btn-success mb-2 rounded-pill px-4 shadow-sm fw-bold">
+                                <i class="fas fa-file-excel mr-1"></i> Exportar a Excel
                             </button>
                         </div>
                     </div>
 
-                    <div class="card p-3 shadow">
-                        <p><strong>Total de registros:</strong> <?= $res->num_rows ?></p>
+                    <div class="card p-4 shadow-sm mb-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                            <h6 class="m-0 font-weight-bold" style="color: #4e73df;">Feedback y Satisfacción</h6>
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                <i class="fas fa-database text-primary mr-1"></i> Total registrados: <?= $res->num_rows ?>
+                            </span>
+                        </div>
+
                         <div class="table-responsive">
-                            <table class="table table-bordered text-center" id="tablaParticipantes">
+                            <table class="table text-left" id="tablaParticipantes">
                                 <thead>
                                     <tr>
-                                        <th>Nombre</th>
-                                        <th>Edad</th>
+                                        <th class="pl-4">Nombre</th>
+                                        <th class="text-center">Edad</th>
                                         <th>Evento</th>
                                         <th>Escuela</th>
                                         <th>Juego</th>
-                                        <th>Fecha Encuesta</th>
-                                        <th>Calificación</th>
+                                        <th>Fecha</th>
+                                        <th class="text-center">Calificación</th>
                                         <th>Comentario</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if ($res->num_rows == 0) : ?>
                                         <tr>
-                                            <td colspan="8">No hay registros</td>
+                                            <td colspan="8" class="text-center py-5 text-muted">
+                                                <i class="fas fa-folder-open fa-3x mb-3" style="color: #cbd5e1;"></i><br>
+                                                Aún no hay encuestas ni participantes registrados.
+                                            </td>
                                         </tr>
                                     <?php endif; ?>
 
                                     <?php while ($row = $res->fetch_assoc()) : ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($row['nombre']) ?></td>
-                                            <td><?= $row['edad'] ?></td>
-                                            <td><?= htmlspecialchars($row['nombre_evento'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($row['nombre_escuela'] ?? '-') ?></td>
-                                            <td><?= htmlspecialchars($row['juego'] ?? '-') ?></td>
-                                            <td><?= $row['fecha'] ? date("d/m/Y", strtotime($row['fecha'])) : '-' ?></td>
+                                            <td class="pl-4 fw-bold text-dark">
+                                                <?= htmlspecialchars($row['nombre']) ?>
+                                            </td>
+
+                                            <td class="text-center">
+                                                <span class="badge bg-light text-dark border rounded-circle" style="padding: 8px 10px;">
+                                                    <?= $row['edad'] ?>
+                                                </span>
+                                            </td>
+
+                                            <td class="text-secondary"><?= htmlspecialchars($row['nombre_evento'] ?? '-') ?></td>
+                                            <td class="text-muted"><small><?= htmlspecialchars($row['nombre_escuela'] ?? '-') ?></small></td>
+
                                             <td>
+                                                <?php if ($row['juego']): ?>
+                                                    <span class="badge px-3 py-1 rounded-pill" style="background-color: #e3f2fd; color: #0288d1; font-weight: 600;">
+                                                        <i class="fas fa-gamepad mr-1"></i> <?= htmlspecialchars($row['juego']) ?>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
+                                            </td>
+
+                                            <td class="text-muted small">
+                                                <?= $row['fecha'] ? date("d/m/Y", strtotime($row['fecha'])) : '-' ?>
+                                            </td>
+
+                                            <td class="text-center">
                                                 <?php
                                                 $cal = $row['calificacion'];
-                                                if ($cal >= 4) echo "<span class='badge badge-success'>$cal ★</span>";
-                                                elseif ($cal == 3) echo "<span class='badge badge-warning'>$cal ★</span>";
-                                                elseif ($cal !== null) echo "<span class='badge badge-danger'>$cal ★</span>";
-                                                else echo "-";
+                                                if ($cal >= 4) {
+                                                    echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #1cc88a; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
+                                                } elseif ($cal == 3) {
+                                                    echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #f6c23e; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
+                                                } elseif ($cal !== null) {
+                                                    echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #e74a3b; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
+                                                } else {
+                                                    echo '<span class="text-muted">-</span>';
+                                                }
                                                 ?>
                                             </td>
-                                            <td><small><?= htmlspecialchars($row['comentario'] ?? '-') ?></small></td>
+
+                                            <td class="text-muted" style="max-width: 250px; font-style: italic;">
+                                                <small><?= htmlspecialchars($row['comentario'] ?? '-') ?></small>
+                                            </td>
                                         </tr>
                                     <?php endwhile; ?>
                                 </tbody>
@@ -172,32 +232,40 @@ $res = $conn->query($sql);
     </div>
 
     <script>
-        // Buscador
+        // Buscador Dinámico
         document.getElementById("buscador").addEventListener("keyup", function() {
             let filtro = this.value.toLowerCase();
             let filas = document.querySelectorAll("#tablaParticipantes tbody tr");
             filas.forEach(fila => {
-                fila.style.display = fila.textContent.toLowerCase().includes(filtro) ? "" : "none";
+                let texto = fila.textContent.toLowerCase();
+                fila.style.display = texto.includes(filtro) ? "" : "none";
             });
         });
 
-        // VALIDACIÓN Y EXPORTACIÓN
+        // VALIDACIÓN Y EXPORTACIÓN MEJORADA (Mismos estilos que Historial)
         function confirmarExportacion() {
             Swal.fire({
                 title: '¿Exportar a Excel?',
                 text: "Se generará un reporte con la satisfacción de los alumnos.",
-                icon: 'question',
+                icon: 'info',
                 showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, exportar',
-                cancelButtonText: 'Cancelar'
+                confirmButtonColor: '#1cc88a',
+                cancelButtonColor: '#e74a3b',
+                confirmButtonText: '<i class="fas fa-download mr-1"></i> Sí, exportar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'rounded-pill px-4 shadow-sm',
+                    cancelButton: 'rounded-pill px-4'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: 'Generando archivo...',
-                        timer: 2000,
+                        title: 'Procesando Documento...',
+                        html: 'Preparando calificaciones',
+                        timer: 1500,
                         timerProgressBar: true,
+                        allowOutsideClick: false,
                         didOpen: () => {
                             Swal.showLoading();
                         },
@@ -210,15 +278,47 @@ $res = $conn->query($sql);
         }
 
         function ejecutarExportacion() {
-            let table = document.getElementById("tablaParticipantes").outerHTML;
-            let estilo = "<style>table, th, td { border: 1px solid #000; border-collapse: collapse; text-align: center; }</style>";
-            let url = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(estilo + table);
+            // Clonamos la tabla para limpiarla antes de exportar
+            let tablaOriginal = document.getElementById("tablaParticipantes");
+            let tablaClon = tablaOriginal.cloneNode(true);
+
+            // Eliminamos los íconos de FontAwesome para que no se exporten
+            let iconos = tablaClon.querySelectorAll('i');
+            iconos.forEach(icono => icono.remove());
+
+            let tableHTML = tablaClon.outerHTML;
+            let estilo = "<style>table { font-family: Arial; } th { background-color: #4e73df; color: white; padding: 10px; } td { padding: 8px; border: 1px solid #dddddd; }</style>";
+
+            let uri = 'data:application/vnd.ms-excel;base64,';
+            let template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">' + estilo + '</head><body><table>{table}</table></body></html>';
+
+            let base64 = function(s) {
+                return window.btoa(unescape(encodeURIComponent(s)))
+            };
+            let format = function(s, c) {
+                return s.replace(/{(\w+)}/g, function(m, p) {
+                    return c[p];
+                })
+            };
+
+            let ctx = {
+                worksheet: 'Reporte_Satisfaccion',
+                table: tablaClon.innerHTML
+            };
+
             let a = document.createElement('a');
-            a.href = url;
-            a.download = 'Reporte_Satisfaccion_IntegraGames.xls';
+            a.href = uri + base64(format(template, ctx));
+            a.download = 'Reporte_Satisfaccion_' + new Date().toISOString().slice(0, 10) + '.xls';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+
+            Swal.fire({
+                icon: 'success',
+                title: '¡Descarga Exitosa!',
+                showConfirmButton: false,
+                timer: 2000
+            });
         }
     </script>
 

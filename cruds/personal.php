@@ -94,6 +94,8 @@ if (isset($_POST['eliminar'])) {
         body {
             background: #eef4ff;
         }
+        .text-primary { color: #4e73df !important; }
+        .text-secondary { color: #858796 !important; }
 
         .bg-primary {
             background-color: #3b82f6 !important;
@@ -144,15 +146,18 @@ if (isset($_POST['eliminar'])) {
             <div id="content">
                 <?php include("../menu/php/barraSuperior.php"); ?>
                 <div class="container-fluid">
+
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-                        <h1 class="h3 text-gray-800 mb-2">Panel de Personal</h1>
+                        <h1 class="h3 text-gray-800 mb-2 fw-bold">Panel de Personal</h1>
                         <div class="d-flex align-items-center flex-wrap">
-                            <div class="input-group mr-2 mb-2" style="width: 400px;">
-                                <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-                                <input type="text" id="buscador" class="form-control" placeholder="Buscar por nombre o rol...">
+                            <div class="input-group mr-2 mb-2" style="width: 350px;">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-primary"></i></span>
+                                </div>
+                                <input type="text" id="buscador" class="form-control border-left-0" placeholder="Buscar por nombre o rol...">
                             </div>
-                            <button class="btn btn-success mb-2" data-toggle="modal" data-target="#modalCrear">
-                                <i class="fas fa-plus"></i> Nuevo Empleado
+                            <button class="btn btn-success mb-2 shadow-sm rounded-pill px-4 fw-bold" data-toggle="modal" data-target="#modalCrear">
+                                <i class="fas fa-user-plus mr-1"></i> Nuevo Empleado
                             </button>
                         </div>
                     </div>
@@ -197,99 +202,163 @@ if (isset($_POST['eliminar'])) {
         </div>
     </div>
 
-    <div class="modal fade" id="modalCrear">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <form method="POST" enctype="multipart/form-data" class="modal-content shadow-lg border-0 rounded-4">
-                <div class="modal-header bg-success text-white rounded-top-4">
-                    <h5 class="mb-0"><i class="fas fa-user-plus mr-2"></i> Nuevo Empleado</h5>
+
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-user-plus mr-2"></i> Nuevo Empleado</h5>
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
 
-                    <label class="fw-bold">Nombre Completo</label>
+                <div class="modal-body p-4">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-address-card mr-1"></i> Información Personal
+                    </h6>
+
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" name="nombre" class="form-control" required>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user"></i></span>
+                        <input type="text" name="nombre" class="form-control border-left-0" placeholder="Nombre completo" required>
                     </div>
-                    <label class="fw-bold">Correo Electrónico</label>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-envelope"></i></span>
+                                <input type="email" name="correo" class="form-control border-left-0" placeholder="Correo electrónico" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user-tag"></i></span>
+                                <select name="rol" class="form-control border-left-0" required>
+                                    <option value="">Seleccionar rol...</option>
+                                    <option value="administrador">Administrador</option>
+                                    <option value="programador">Programador</option>
+                                    <option value="promotor">Promotor</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3 mt-2 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-shield-alt mr-1"></i> Seguridad
+                    </h6>
+
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="email" name="correo" class="form-control" required>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-lock"></i></span>
+                        <input type="password" name="contrasena" id="passCrear" class="form-control border-left-0" placeholder="Contraseña de acceso" required>
+                        <button class="btn btn-outline-secondary border-left-0" type="button" onclick="togglePassword('passCrear', this)"><i class="fa fa-eye"></i></button>
                     </div>
-                    <label class="fw-bold">Contraseña</label>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" name="contrasena" id="passCrear" class="form-control" required>
-                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('passCrear', this)"><i class="fa fa-eye"></i></button>
+
+                    <h6 class="fw-bold mb-3 mt-2 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-camera mr-1"></i> Fotografía
+                    </h6>
+
+                    <div class="row align-items-center bg-light p-3 rounded-3 mx-0 border">
+                        <div class="col-md-4 text-center border-right">
+                            <p class="mb-2 small fw-bold text-uppercase" style="color: #4e73df;">Vista Previa</p>
+                            <img id="previewNuevo" src="../img/responsables/sinFoto.jpg" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        </div>
+                        <div class="col-md-8 pl-md-4 mt-3 mt-md-0">
+                            <p class="mb-2 small fw-bold text-uppercase" style="color: #4e73df;">Subir Imagen</p>
+                            <input type="file" name="imagen" class="form-control form-control-sm" accept="image/*" onchange="document.getElementById('previewNuevo').src = window.URL.createObjectURL(this.files[0])">
+                            <small class="text-muted mt-1 d-block" style="font-size: 0.75rem;">
+                                <i class="fas fa-info-circle"></i> Opcional. Se recomienda que el rostro esté centrado.
+                            </small>
+                        </div>
                     </div>
-                    <label class="fw-bold">Rol</label>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                        <select name="rol" class="form-control" required>
-                            <option value="">Seleccionar rol...</option>
-                            <option value="administrador">Administrador</option>
-                            <option value="programador">Programador</option>
-                            <option value="promotor">Promotor</option>
-                        </select>
-                    </div>
+
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" name="crear" class="btn btn-success px-4 rounded-pill">
-                        <i class="fas fa-save mr-2"></i> Guardar Empleado
+
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-outline-danger rounded-pill px-4" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="crear" class="btn btn-success text-white fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="fas fa-save mr-1"></i> Guardar Empleado
                     </button>
                 </div>
+
             </form>
         </div>
     </div>
 
-    <div class="modal fade" id="modalEditar">
-        <div class="modal-dialog modal-dialog-centered">
+    <div class="modal fade" id="modalEditar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
             <form method="POST" enctype="multipart/form-data" class="modal-content shadow-lg border-0 rounded-4">
-                <div class="modal-header bg-info text-white rounded-top-4">
-                    <h5 class="mb-0"><i class="fas fa-user-edit mr-2"></i> Editar Empleado</h5>
+
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-user-edit mr-2"></i> Editar Empleado</h5>
                     <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
+
+                <div class="modal-body p-4">
                     <input type="hidden" name="id" id="editId">
-                    <div class="text-center mb-3">
-                        <img id="previewEditar" src="" class="perfil-img-preview shadow-sm">
-                    </div>
-                    <label class="fw-bold">Cambiar Foto</label>
-                    <div class="custom-file mb-3">
-                        <input type="file" name="imagen" class="custom-file-input" id="imgEditar" accept="image/*" onchange="previewImagen(event, 'previewEditar')">
-                        <label class="custom-file-label" for="imgEditar">Seleccionar nueva...</label>
-                    </div>
-                    <label class="fw-bold">Nombre Completo</label>
+
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-address-card mr-1"></i> Información Personal
+                    </h6>
+
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-user"></i></span>
-                        <input type="text" name="nombre" id="editNombre" class="form-control" required>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user"></i></span>
+                        <input type="text" name="nombre" id="editNombre" class="form-control border-left-0" required>
                     </div>
-                    <label class="fw-bold">Correo Electrónico</label>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-envelope"></i></span>
+                                <input type="email" name="correo" id="editCorreo" class="form-control border-left-0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user-tag"></i></span>
+                                <select name="rol" id="editRol" class="form-control border-left-0" required>
+                                    <option value="administrador">Administrador</option>
+                                    <option value="programador">Programador</option>
+                                    <option value="promotor">Promotor</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3 mt-2 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-shield-alt mr-1"></i> Seguridad
+                    </h6>
+
                     <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                        <input type="email" name="correo" id="editCorreo" class="form-control" required>
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-lock"></i></span>
+                        <input type="password" name="contrasena" id="editContrasena" class="form-control border-left-0" placeholder="Dejar vacío para no cambiar contraseña">
+                        <button class="btn btn-outline-secondary border-left-0" type="button" onclick="togglePassword('editContrasena', this)"><i class="fa fa-eye"></i></button>
                     </div>
-                    <label class="fw-bold">Contraseña</label>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                        <input type="password" name="contrasena" id="editContrasena" class="form-control" placeholder="Dejar vacío para no cambiar">
-                        <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('editContrasena', this)"><i class="fa fa-eye"></i></button>
+
+                    <h6 class="fw-bold mb-3 mt-2 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-camera mr-1"></i> Fotografía
+                    </h6>
+
+                    <div class="row align-items-center bg-light p-3 rounded-3 mx-0 border">
+                        <div class="col-md-4 text-center border-right">
+                            <p class="mb-2 small fw-bold text-uppercase" style="color: #4e73df;">Imagen Actual</p>
+                            <img id="previewEditar" src="" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        </div>
+                        <div class="col-md-8 pl-md-4 mt-3 mt-md-0">
+                            <p class="mb-2 small fw-bold text-uppercase" style="color: #4e73df;">Cambiar Imagen</p>
+                            <input type="file" name="imagen" class="form-control form-control-sm" accept="image/*" onchange="document.getElementById('previewEditar').src = window.URL.createObjectURL(this.files[0])">
+                            <small class="text-muted mt-1 d-block" style="font-size: 0.75rem;">
+                                <i class="fas fa-info-circle"></i> Opcional. Si no subes nada, se conservará la foto actual.
+                            </small>
+                        </div>
                     </div>
-                    <label class="fw-bold">Rol</label>
-                    <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                        <select name="rol" id="editRol" class="form-control" required>
-                            <option value="administrador">Administrador</option>
-                            <option value="programador">Programador</option>
-                            <option value="promotor">Promotor</option>
-                        </select>
-                    </div>
+
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" name="editar" class="btn btn-success px-4 rounded-pill">
-                        <i class="fas fa-save mr-2"></i> Guardar Cambios
+
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-outline-danger rounded-pill px-4" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="editar" class="btn btn-info text-white fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="fas fa-save mr-1"></i> Guardar Cambios
                     </button>
                 </div>
+
             </form>
         </div>
     </div>

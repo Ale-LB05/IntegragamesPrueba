@@ -22,7 +22,8 @@ FROM evento e
 LEFT JOIN evento_responsable er ON e.id_evento = er.id_evento
 LEFT JOIN responsable r ON er.id_responsable = r.id_responsable
 LEFT JOIN participante p ON e.id_evento = p.id_evento
-GROUP BY e.id_evento";
+GROUP BY e.id_evento
+ORDER BY e.fecha DESC";
 
 $res = $conn->query($sql);
 ?>
@@ -32,7 +33,7 @@ $res = $conn->query($sql);
 
 <head>
     <meta charset="UTF-8">
-    <title>Eventos Registrados</title>
+    <title>Historial de Eventos</title>
 
     <?php include("../menu/php/encabezado.php"); ?>
     <link rel="icon" href="../img/logo.png" type="image/png">
@@ -43,49 +44,59 @@ $res = $conn->query($sql);
     <style>
         body {
             background: #eef4ff;
-            font-family: 'Segoe UI';
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        .text-primary { color: #4e73df !important; }
+        .text-secondary { color: #858796 !important; }
 
-        h2 {
-            color: #1e3a8a;
-            font-weight: bold;
-        }
+        .bg-primary { background-color: #4e73df !important; }
+        
         .card {
             transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
             transform: none !important;
             border: none !important;
             background: #ffffff;
-            border-radius: 20px !important; /* Más redondeado para verse moderno */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
         }
 
         .card:hover {
-            transform: none !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
         }
 
+        /* Estilos de Tabla Premium */
+        .table-responsive { border-radius: 15px; overflow: hidden; }
+        
         .table thead {
-            background: #3b82f6;
+            background: #4e73df;
             color: white;
+            border-bottom: none;
         }
-
-        .table tbody tr:hover {
-            background: #e0ecff;
-        }
-
-        table {
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        thead th {
+        
+        .table thead th {
+            font-size: 0.85rem;
             text-transform: uppercase;
-            font-size: 13px;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            border: none;
+            padding: 15px;
         }
 
-        tbody td {
-            vertical-align: middle;
+        .table tbody tr {
+            border-bottom: 1px solid #f1f3f5;
+            transition: background-color 0.2s ease;
         }
+
+        .table tbody tr:hover { background-color: #f8f9fc; }
+        
+        .table tbody td {
+            vertical-align: middle;
+            border: none;
+            padding: 15px;
+            color: #5a5c69;
+        }
+        
+        .rounded-pill { border-radius: 50rem !important; }
     </style>
 </head>
 
@@ -100,48 +111,85 @@ $res = $conn->query($sql);
 
                 <div class="container-fluid">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-                        <h1 class="h3 text-gray-800 mb-2">Eventos Registrados</h1>
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div class="input-group mr-2 mb-2" style="width: 400px;">
+                        <h1 class="h3 text-gray-800 mb-2 fw-bold">
+                            <i class="fas mr-2"></i> Historial de Registros
+                        </h1>
+                        
+                        <div class="d-flex align-items-center flex-wrap">
+                            <div class="input-group mr-3 mb-2" style="width: 350px;">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                                    <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-primary"></i></span>
                                 </div>
-                                <input type="text" id="buscador" class="form-control" placeholder="Buscar evento...">
+                                <input type="text" id="buscador" class="form-control border-left-0" placeholder="Buscar evento, responsable o lugar...">
                             </div>
 
-                            <button onclick="confirmarExportacion()" class="btn btn-success mb-2">
-                                <i class="fas fa-file-excel"></i> Exportar a Excel
+                            <button onclick="confirmarExportacion()" class="btn btn-success mb-2 rounded-pill px-4 shadow-sm fw-bold">
+                                <i class="fas fa-file-excel mr-1"></i> Exportar a Excel
                             </button>
                         </div>
                     </div>
 
-                    <div class="card p-3 shadow">
-                        <p><strong>Total de registros:</strong> <?= $res->num_rows ?></p>
+                    <div class="card p-4 shadow-sm mb-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+                            <h6 class="m-0 font-weight-bold" style="color: #4e73df;">Resumen de Asistencia General</h6>
+                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                                <i class="fas fa-database text-primary mr-1"></i> Total de eventos: <?= $res->num_rows ?>
+                            </span>
+                        </div>
 
                         <div class="table-responsive">
-                            <table class="table table-bordered text-center" id="tablaRegistros">
+                            <table class="table text-left" id="tablaRegistros">
                                 <thead>
                                     <tr>
-                                        <th>Evento</th>
-                                        <th>Lugar</th>
-                                        <th>Fecha</th>
-                                        <th>Responsable</th>
-                                        <th>Total Personas</th>
+                                        <th class="pl-4">Nombre del Evento</th>
+                                        <th>Fecha de Realización</th>
+                                        <th>Lugar / Ubicación</th>
+                                        <th>Personal a Cargo</th>
+                                        <th class="text-center">Total Personas</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php if ($res->num_rows == 0) { ?>
                                         <tr>
-                                            <td colspan="5">No hay registros</td>
+                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                <i class="fas fa-folder-open fa-3x mb-3" style="color: #cbd5e1;"></i><br>
+                                                No hay registros disponibles en el historial.
+                                            </td>
                                         </tr>
                                     <?php } ?>
+                                    
                                     <?php while ($row = $res->fetch_assoc()) { ?>
                                         <tr>
-                                            <td><?= htmlspecialchars($row['nombre_evento']) ?></td>
-                                            <td><?= htmlspecialchars($row['lugar']) ?></td>
-                                            <td><?= $row['fecha'] ? date("d/m/Y", strtotime($row['fecha'])) : '-' ?></td>
-                                            <td><?= htmlspecialchars($row['nombre_responsable'] ?? 'Sin asignar') ?></td>
-                                            <td><?= $row['total_personas'] ?></td>
+                                            <td class="pl-4">
+                                                <span class="fw-bold text-dark"><?= htmlspecialchars($row['nombre_evento']) ?></span>
+                                            </td>
+                                            
+                                            <td>
+                                                <span class="text-muted small fw-bold">
+                                                    <i class="fas fa-calendar-day mr-1" style="color: #4e73df;"></i> 
+                                                    <?= $row['fecha'] ? date("d/m/Y", strtotime($row['fecha'])) : '-' ?>
+                                                </span>
+                                            </td>
+                                            
+                                            <td>
+                                                <span class="text-muted small">
+                                                    <i class="fas fa-map-marker-alt mr-1 text-danger"></i> 
+                                                    <?= htmlspecialchars($row['lugar']) ?>
+                                                </span>
+                                            </td>
+                                            
+                                            <td>
+                                                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" style="font-weight: 500;">
+                                                    <i class="fas fa-user-tie text-primary mr-1"></i> 
+                                                    <?= htmlspecialchars($row['nombre_responsable'] ?? 'Sin asignar') ?>
+                                                </span>
+                                            </td>
+                                            
+                                            <td class="text-center">
+                                                <span class="badge px-3 py-2 rounded-pill shadow-sm" style="background-color: #e3f2fd; color: #0288d1; font-size: 0.9rem;">
+                                                    <i class="fas fa-users mr-1"></i> <?= $row['total_personas'] ?>
+                                                </span>
+                                            </td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>
@@ -154,8 +202,13 @@ $res = $conn->query($sql);
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
+
     <script>
-        // Buscador en tiempo real
+        // Buscador Dinámico Fluido
         document.getElementById("buscador").addEventListener("keyup", function() {
             let filtro = this.value.toLowerCase();
             let filas = document.querySelectorAll("#tablaRegistros tbody tr");
@@ -166,24 +219,30 @@ $res = $conn->query($sql);
             });
         });
 
-        // VALIDACIÓN Y EXPORTACIÓN
+        // VALIDACIÓN Y EXPORTACIÓN (Modales SweetAlert Mejorados)
         function confirmarExportacion() {
             Swal.fire({
-                title: '¿Exportar registros?',
-                text: "Se generará un archivo Excel con la información actual de la tabla.",
-                icon: 'question',
+                title: '¿Generar Reporte Excel?',
+                text: "Se descargará un archivo con la lista actual de asistencia a eventos.",
+                icon: 'info',
                 showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Sí, descargar',
-                cancelButtonText: 'Cancelar'
+                confirmButtonColor: '#1cc88a', // Verde de la plantilla
+                cancelButtonColor: '#e74a3b',  // Rojo de la plantilla
+                confirmButtonText: '<i class="fas fa-download mr-1"></i> Sí, descargar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'rounded-pill px-4 shadow-sm',
+                    cancelButton: 'rounded-pill px-4'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Simulación de carga
                     Swal.fire({
-                        title: 'Generando archivo...',
+                        title: 'Procesando Documento...',
+                        html: 'Preparando filas y columnas',
                         timer: 1500,
                         timerProgressBar: true,
+                        allowOutsideClick: false,
                         didOpen: () => {
                             Swal.showLoading();
                         },
@@ -196,31 +255,42 @@ $res = $conn->query($sql);
         }
 
         function ejecutarExportacion() {
-            let table = document.getElementById("tablaRegistros").outerHTML;
-            // Estilo básico para que el Excel reconozca bordes
-            let estilo = "<style>table, th, td { border: 1px solid black; border-collapse: collapse; }</style>";
-            let url = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(estilo + table);
+            // Clonamos la tabla para no afectar la vista original al quitar íconos
+            let tablaOriginal = document.getElementById("tablaRegistros");
+            let tablaClon = tablaOriginal.cloneNode(true);
+            
+            // Eliminamos los íconos de FontAwesome del clon para que no se exporten al Excel
+            let iconos = tablaClon.querySelectorAll('i');
+            iconos.forEach(icono => icono.remove());
 
+            let tableHTML = tablaClon.outerHTML;
+            let estilo = "<style>table { font-family: Arial; } th { background-color: #4e73df; color: white; padding: 10px; } td { padding: 8px; border: 1px solid #dddddd; }</style>";
+            
+            // Reemplazar espacios y tildes para evitar errores de codificación
+            let uri = 'data:application/vnd.ms-excel;base64,';
+            let template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8">' + estilo + '</head><body><table>{table}</table></body></html>';
+            
+            let base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+            let format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+
+            let ctx = {worksheet: 'Historial_Asistencia', table: tablaClon.innerHTML};
+            
             let a = document.createElement('a');
-            a.href = url;
-            a.download = 'Reporte_Eventos_IntegraGames.xls';
+            a.href = uri + base64(format(template, ctx));
+            a.download = 'Reporte_IntegraGames_' + new Date().toISOString().slice(0,10) + '.xls';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
 
             Swal.fire({
                 icon: 'success',
-                title: '¡Descarga completada!',
+                title: '¡Descarga Exitosa!',
+                text: 'Tu archivo Excel se ha guardado correctamente.',
                 showConfirmButton: false,
-                timer: 1500
+                timer: 2000
             });
         }
     </script>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
 </body>
 
 </html>
