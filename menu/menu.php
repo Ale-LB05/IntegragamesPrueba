@@ -22,19 +22,59 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
     <link rel="icon" href="../img/logo.png" type="image/png">
     <link href="../css/styles.css" rel="stylesheet">
     <style>
-        .card {
-            transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-            transform: none !important;
-            border: none !important;
-            background: #ffffff;
-            border-radius: 20px !important;
-            /* Más redondeado para verse moderno */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+        body {
+            background: #eef4ff;
         }
 
-        .card:hover {
-            transform: none !important;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12) !important;
+        .rounded-4 {
+            border-radius: 1rem !important;
+        }
+
+        /* Efecto de levitación para las tarjetas */
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+            border: none !important;
+            background: #ffffff;
+            border-radius: 1rem !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-7px) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Imágenes del mismo tamaño para que no se deforme el diseño */
+        .img-uniforme {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+
+        /* Banner Principal Moderno */
+        .hero-banner {
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem !important;
+        }
+
+        .hero-icon-bg {
+            position: absolute;
+            font-size: 15rem;
+            right: -20px;
+            bottom: -50px;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        .badge-soft-primary {
+            background-color: #e3f2fd;
+            color: #4e73df;
         }
     </style>
 </head>
@@ -43,40 +83,51 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
 
     <div id="wrapper">
 
-        <!-- MENU -->
         <?php include("php/menuLateral.php"); ?>
 
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
 
-                <!-- BARRA -->
                 <?php include("php/barraSuperior.php"); ?>
-                <div class="container-fluid">
+                <div class="container-fluid mb-5">
 
-                    <!-- ENCABEZADO -->
-                    <div class="row mb-4">
+                    <div class="row mb-5 mt-2">
                         <div class="col-12">
-                            <div class="card shadow">
-                                <div class="card-body text-center">
-                                    <h4 class="font-weight-bold">IntegraGames</h4>
-                                    <p class="mb-0">
-                                        IntegraGames es una plataforma web interactiva diseñada para promover la carrera de Tecnologías de la Información (TI) de la UTM mediante la gamificación.
-                                        El sistema combina el aprendizaje con el entretenimiento para que futuros estudiantes conozcan el plan de estudios y conceptos clave de programación de forma dinámica.
-                                    </p>
+                            <div class="card shadow-lg border-0 hero-banner">
+                                <div class="card-body p-5 position-relative z-index-1">
+                                    <div class="row align-items-center">
+                                        <div class="col-lg-8">
+                                            <span class="badge bg-light text-primary px-3 py-2 rounded-pill mb-3 fw-bold">
+                                                <i class="fas fa-user-circle mr-1"></i> Hola, <?= htmlspecialchars($_SESSION['usuario']) ?>
+                                            </span>
+                                            <h2 class="font-weight-bold mb-3 text-white">¡Bienvenido a IntegraGames!</h2>
+                                            <p class="lead mb-0" style="opacity: 0.9; font-size: 1.1rem; line-height: 1.6;">
+                                                IntegraGames es una plataforma web interactiva diseñada para promover la carrera de <strong>Tecnologías de la Información (TI)</strong> de la UTM mediante la gamificación. Combina el aprendizaje con el entretenimiento para conocer el plan de estudios de forma dinámica.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
+                                <i class="fas fa-gamepad hero-icon-bg"></i>
                             </div>
                         </div>
                     </div>
 
-                    <!-- TARJETAS -->
-                    <div class="row">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h4 class="mb-0 fw-bold text-gray-800">
+                            <?php if (in_array(strtolower($rol), $rolesPermitidos)) { ?>
+                                <i class="fas fa-calendar-alt mr-2" style="color: #4e73df;"></i> Próximos Eventos
+                            <?php } else { ?>
+                                <i class="fas fa-rocket mr-2" style="color: #4e73df;"></i> Descubre la Carrera
+                            <?php } ?>
+                        </h4>
+                    </div>
 
+                    <div class="row mb-5">
                         <?php
-                        /* ADMIN / PROMOTOR / PROGRAMADOR*/
-                        if (in_array(strtolower($rol), ['administrador', 'programador', 'promotor'])) {
+                        /* ADMIN / PROMOTOR / PROGRAMADOR - VEN EVENTOS */
+                        if (in_array(strtolower($rol), $rolesPermitidos)) {
 
                             $hoy = date("Y-m-d");
-
                             $sql = "SELECT nombre_evento, imagen, observaciones, fecha, hora, lugar, ubicacion
                                     FROM evento
                                     WHERE fecha >= '$hoy'
@@ -85,71 +136,67 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                             $resultado = mysqli_query($conn, $sql);
 
                             if ($resultado && mysqli_num_rows($resultado) > 0) {
-
                                 while ($evento = mysqli_fetch_assoc($resultado)) {
                         ?>
-
-                                    <div class="col-lg-3 col-md-6 mb-4">
-                                        <div class="card shadow h-100">
+                                    <div class="col-lg-4 col-md-6 mb-4">
+                                        <div class="card hover-lift h-100">
                                             <img src="../img/eventos/<?php echo $evento['imagen']; ?>"
                                                 class="card-img-top img-uniforme" alt="Imagen del evento">
 
-                                            <div class="card-body d-flex flex-column">
-                                                <h6 class="font-weight-bold text-black mb-2">
-                                                    <?php echo htmlspecialchars($evento['nombre_evento']); ?>
-                                                </h6>
+                                            <div class="card-body d-flex flex-column p-4">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <h5 class="font-weight-bold text-dark mb-0">
+                                                        <?php echo htmlspecialchars($evento['nombre_evento']); ?>
+                                                    </h5>
+                                                    <span class="badge badge-soft-primary px-2 py-1 rounded-pill">Próximo</span>
+                                                </div>
 
-                                                <p class="text-muted small mb-1">
-                                                    <i class="fas fa-calendar-alt fa-fw mr-1"></i>
-                                                    <strong>Fecha:</strong> <?php echo date("d/m/Y", strtotime($evento['fecha'])); ?>
-                                                </p>
-
-                                                <?php if (!empty($evento['hora'])): ?>
-                                                    <p class="text-muted small mb-1">
-                                                        <i class="fas fa-clock fa-fw mr-1"></i>
-                                                        <strong>Hora:</strong> <?php echo date("h:i A", strtotime($evento['hora'])); ?>
+                                                <div class="mt-3">
+                                                    <p class="text-muted small mb-2">
+                                                        <i class="fas fa-calendar-day fa-fw mr-2" style="color: #4e73df;"></i>
+                                                        <strong>Fecha:</strong> <?php echo date("d/m/Y", strtotime($evento['fecha'])); ?>
                                                     </p>
-                                                <?php endif; ?>
 
-                                                <p class="text-muted small mb-1">
-                                                    <i class="fas fa-map-marker-alt fa-fw mr-1"></i>
-                                                    <strong>Lugar:</strong> <?php echo htmlspecialchars($evento['lugar'] ?? 'Ubicación no disponible'); ?>
-                                                </p>
+                                                    <?php if (!empty($evento['hora'])): ?>
+                                                        <p class="text-muted small mb-2">
+                                                            <i class="fas fa-clock fa-fw mr-2" style="color: #4e73df;"></i>
+                                                            <strong>Hora:</strong> <?php echo date("h:i A", strtotime($evento['hora'])); ?>
+                                                        </p>
+                                                    <?php endif; ?>
 
-                                                <p class="text-muted small mb-1">
-                                                    <i class="fas fa-map-marker-alt fa-fw mr-1"></i>
-                                                    <strong>Ubicación:</strong> <?php echo htmlspecialchars($evento['ubicacion'] ?? 'No especificado'); ?>
+                                                    <p class="text-muted small mb-2">
+                                                        <i class="fas fa-map-marker-alt fa-fw mr-2" style="color: #e74a3b;"></i>
+                                                        <strong>Lugar:</strong> <?php echo htmlspecialchars($evento['lugar'] ?? 'Ubicación no disponible'); ?>
+                                                    </p>
+                                                </div>
 
+                                                <div class="mt-auto pt-3 border-top">
                                                     <?php if (!empty($evento['ubicacion'])): ?>
                                                         <a href="https://www.google.com/maps/search/?api=1&query=<?php echo $evento['ubicacion']; ?>"
                                                             target="_blank"
-                                                            class="btn btn-sm btn-outline-primary p-0 px-1 ml-1 ms-2"
-                                                            title="Ver en el mapa"
-                                                            style="font-size: 0.7rem; border-radius: 10px;">
-                                                            <i class="fas fa-map-marker-alt"></i> Ver Mapa
+                                                            class="btn btn-sm btn-outline-primary rounded-pill w-100">
+                                                            <i class="fas fa-map-marked-alt mr-1"></i> Ver en Google Maps
                                                         </a>
+                                                    <?php else: ?>
+                                                        <p class="text-muted small mb-0 text-center"><i class="fas fa-info-circle"></i> <?php echo htmlspecialchars($evento['observaciones']); ?></p>
                                                     <?php endif; ?>
-                                                </p>
-
-                                                <p class="text-dark small mb-0">
-                                                    <i class="fas fa-info-circle fa-fw mr-1"></i>
-                                                    <?php echo htmlspecialchars($evento['observaciones']); ?>
-                                                </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-
                                 <?php
                                 }
                             } else {
-                                echo "<div class='col-12 text-center'>
-                            <p>No hay eventos programados.</p>
-                          </div>";
+                                echo "<div class='col-12'>
+                                        <div class='alert alert-light border text-center py-5 rounded-4 shadow-sm'>
+                                            <i class='fas fa-calendar-times fa-3x text-muted mb-3'></i>
+                                            <h5 class='text-muted fw-bold'>No hay eventos programados por el momento.</h5>
+                                        </div>
+                                      </div>";
                             }
 
-                            /*PARTICIPANTE*/
+                            /* PARTICIPANTE - VE TARJETAS INFORMATIVAS */
                         } else {
-
                             $juegosInfo = [
                                 [
                                     "nombre" => "Domina el Futuro Digital",
@@ -173,105 +220,81 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                                 ]
                             ];
 
-                            foreach ($juegosInfo as $juego) {
+                            foreach ($juegosInfo as $info) {
                                 ?>
-
                                 <div class="col-lg-3 col-md-6 mb-4">
-                                    <div class="card shadow h-100">
-
-                                        <img src="<?php echo $juego['imagen']; ?>"
-                                            class="card-img-top img-uniforme">
-
-                                        <div class="card-body d-flex flex-column">
-                                            <h6 class="font-weight-bold">
-                                                <?php echo $juego['nombre']; ?>
+                                    <div class="card hover-lift h-100">
+                                        <img src="<?php echo $info['imagen']; ?>" class="card-img-top img-uniforme">
+                                        <div class="card-body text-center p-4">
+                                            <h6 class="font-weight-bold text-dark mb-3">
+                                                <?php echo $info['nombre']; ?>
                                             </h6>
-
-                                            <p class="text-muted small">
-                                                <?php echo $juego['descripcion']; ?>
+                                            <p class="text-muted small mb-0">
+                                                <?php echo $info['descripcion']; ?>
                                             </p>
                                         </div>
-
                                     </div>
                                 </div>
-
                         <?php
                             }
                         }
                         ?>
-
                     </div>
 
-                    <!-- LISTADO DE JUEGOS -->
-                    <div class="row mt-4">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h4 class="mb-0 fw-bold text-gray-800"><i class="fas fa-gamepad mr-2" style="color: #1cc88a;"></i> Zona Arcade</h4>
+                    </div>
 
-                        <div class="col-12">
-                            <h4 class="mb-4">Juegos</h4>
-                        </div>
-
+                    <div class="row">
                         <?php
                         $juegos = [
                             [
                                 "nombre" => "Error 404",
                                 "imagen" => "../img/uno/uno.png",
-                                "descripcion" => "Juego de cartas competitivo.",
-                                "link" => "../juegos/error404.php"
+                                "descripcion" => "Juego de cartas competitivo para mentes ágiles.",
+                                "link" => "../juegos/error404.php",
+                                "color" => "info"
                             ],
                             [
                                 "nombre" => "Code Run",
                                 "imagen" => "../img/codeRun/runCode.png",
-                                "descripcion" => "Evita enemigos y supera niveles.",
-                                "link" => "../juegos/codeRun.php"
+                                "descripcion" => "Evita enemigos y supera niveles programando tus pasos.",
+                                "link" => "../juegos/codeRun.php",
+                                "color" => "info"
                             ],
                             [
                                 "nombre" => "Juego 3",
                                 "imagen" => "../img/juego3.jpg",
-                                "descripcion" => "Reglas básicas del juego.",
-                                "link" => "../juegos/juego3.php"
+                                "descripcion" => "Aprende las reglas básicas y diviértete compitiendo.",
+                                "link" => "../juegos/juego3.php",
+                                "color" => "info"
                             ]
                         ];
 
                         foreach ($juegos as $juego) {
                         ?>
-
-                            <div class="col-12 mb-4">
-                                <div class="card shadow">
-                                    <div class="card-body">
-
-                                        <div class="row align-items-center">
-
-                                            <div class="col-md-4">
-                                                <img src="<?php echo $juego['imagen']; ?>"
-                                                    class="img-fluid rounded img-uniforme">
-                                            </div>
-
-                                            <div class="col-md-6">
-                                                <h5><?php echo $juego['nombre']; ?></h5>
-                                                <p class="text-muted">
-                                                    <?php echo $juego['descripcion']; ?>
-                                                </p>
-                                            </div>
-
-                                            <div class="col-md-2 text-center">
-                                                <a href="<?php echo $juego['link']; ?>"
-                                                    class="btn btn-primary btn-sm text-white"> Ver más
-                                                </a>
-                                            </div>
-
+                            <div class="col-lg-4 col-md-6 mb-4">
+                                <div class="card hover-lift h-100 text-center">
+                                    <div class="card-body p-4">
+                                        <div class="mb-3">
+                                            <img src="<?php echo $juego['imagen']; ?>" class="img-fluid rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #fff;">
                                         </div>
-
+                                        <h4 class="font-weight-bold text-dark"><?php echo $juego['nombre']; ?></h4>
+                                        <p class="text-muted small mb-4">
+                                            <?php echo $juego['descripcion']; ?>
+                                        </p>
+                                        <a href="<?php echo $juego['link']; ?>" class="btn btn-<?php echo $juego['color']; ?> rounded-pill px-4 shadow-sm w-100 fw-bold">
+                                            <i class="fas fa-play-circle mr-1"></i> Jugar Ahora
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-
                         <?php } ?>
-
                     </div>
 
                 </div>
             </div>
 
-            <!-- FOOTER -->
             <?php include("php/piePagina.php"); ?>
 
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -280,8 +303,12 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                     document.addEventListener('DOMContentLoaded', function() {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Bienvenido',
-                            text: 'Inicio de sesión exitoso'
+                            title: '¡Bienvenido!',
+                            text: 'Inicio de sesión exitoso',
+                            showConfirmButton: false,
+                            timer: 2000
+                        }).then(() => {
+                            window.history.replaceState({}, document.title, window.location.pathname);
                         });
                     });
                 </script>
@@ -290,8 +317,7 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
         </div>
     </div>
 
-    <!-- SCROLL -->
-    <a class="scroll-to-top rounded" href="#page-top">
+    <a class="scroll-to-top rounded-circle shadow" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
 

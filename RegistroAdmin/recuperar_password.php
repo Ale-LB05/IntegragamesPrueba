@@ -1,10 +1,32 @@
+<?php
+session_start();
+include("../config/conexion.php");
+
+$mensaje = "";
+$tipo = "";
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['correo'])) {
+    $correo = $conn->real_escape_string($_POST['correo']);
+
+    $sql = "SELECT id_responsable, nombre FROM responsable WHERE correo = '$correo'";
+    $res = $conn->query($sql);
+
+    $mensaje = "Si el correo coincide con una cuenta activa, te hemos enviado las instrucciones para restablecer tu contraseña.";
+    $tipo = "success";
+
+    if ($res && $res->num_rows > 0) {
+        $usuario = $res->fetch_assoc();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login | IntegraGames</title>
+    <title>Recuperar Contraseña | IntegraGames</title>
     <link rel="icon" href="../img/logo.png" type="image/png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -78,18 +100,6 @@
             border-color: var(--accent-color);
         }
 
-        .btn-outline-secondary {
-            border-color: #dee2e6;
-            border-left: none;
-            color: #6c757d;
-        }
-
-        .btn-outline-secondary:hover {
-            background: transparent;
-            color: var(--accent-hover);
-            border-color: #dee2e6;
-        }
-
         .btn-primary {
             background: linear-gradient(to right, var(--accent-color), var(--accent-hover));
             border: none;
@@ -122,49 +132,32 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-5 col-lg-4">
-                <div class="card shadow-2xl">
+                <div class="card shadow-lg">
                     <div class="card-body p-4 p-md-5">
                         <div class="text-center mb-4 login-header">
-                            <img src="../img/logo.png" alt="Logo" class="mb-3" style="height: 80px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2));">
-                            <h3>IntegraGames</h3>
-                            <p class="text-muted small">Panel de Encargado</p>
+                            <i class="fas fa-user-lock fa-3x mb-3 text-primary" style="color: #2a5298 !important;"></i>
+                            <h3>Recuperación</h3>
+                            <p class="text-muted small">Ingresa tu correo para restablecer tu contraseña.</p>
                         </div>
 
-                        <form id="loginForm" action="validar_login.php" method="POST" autocomplete="off">
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold">Correo Electrónico</label>
+                        <form action="" method="POST" autocomplete="off">
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold">Correo Electrónico Registrado</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                     <input type="email" class="form-control" name="correo" placeholder="ejemplo@utm.mx" required>
                                 </div>
                             </div>
 
-                            <div class="mb-4">
-                                <label class="form-label small fw-bold">Contraseña</label>
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                                    <input type="password" id="passwordInput" class="form-control" name="password" placeholder="••••••••" required>
-                                    <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
-                                        <i id="toggleIcon" class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-
-                                <div class="text-end">
-                                    <a href="recuperar_password.php" class="small fw-bold text-decoration-none" style="color: #2a5298;">
-                                        ¿Olvidaste tu contraseña?
-                                    </a>
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <i class="fa-solid fa-right-to-bracket me-2"></i> Iniciar Sesión
+                            <button type="submit" class="btn btn-primary w-100 mb-3 text-white">
+                                <i class="fas fa-paper-plane me-2"></i> Enviar Enlace
                             </button>
                         </form>
 
                         <hr>
                         <div class="text-center">
-                            <a href="../index.php" class="back-link text-decoration-none">
-                                <i class="fa-solid fa-house me-1"></i> Volver al inicio
+                            <a href="login.php" class="back-link text-decoration-none">
+                                <i class="fas fa-arrow-left me-1"></i> Volver al Login
                             </a>
                         </div>
                     </div>
@@ -173,38 +166,24 @@
         </div>
     </div>
 
-    <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('passwordInput');
-            const toggleIcon = document.getElementById('toggleIcon');
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
-    </script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <?php if (isset($_GET['error'])) { ?>
+    <?php if (!empty($mensaje)) { ?>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Acceso Denegado',
-                    text: 'Las credenciales ingresadas no son válidas.',
+                    icon: '<?= $tipo ?>',
+                    title: 'Proceso completado',
+                    text: '<?= $mensaje ?>',
                     confirmButtonColor: '#1e3c72',
                     background: '#fff',
                     heightAuto: false,
                     customClass: {
                         popup: 'rounded-4'
                     }
+                }).then(() => {
+                    // Redirigir de vuelta al login después de leer el mensaje
+                    window.location.href = 'login.php';
                 });
             });
         </script>
