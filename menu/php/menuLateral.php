@@ -1,4 +1,13 @@
 <head>
+    <style>
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-secondary {
+            color: #858796 !important;
+        }
+    </style>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">

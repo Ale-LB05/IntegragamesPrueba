@@ -2,7 +2,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db = "integragamesP2";
+$db = "integragamesP3";
 
 $conn = new mysqli($host,$user,$pass,$db);
 

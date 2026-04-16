@@ -25,6 +25,8 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
         body {
             background: #eef4ff;
         }
+        .text-primary { color: #4e73df !important; }
+        .text-secondary { color: #858796 !important; }
 
         .rounded-4 {
             border-radius: 1rem !important;
@@ -266,7 +268,7 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                                 "nombre" => "Juego 3",
                                 "imagen" => "../img/juego3.jpg",
                                 "descripcion" => "Aprende las reglas básicas y diviértete compitiendo.",
-                                "link" => "../juegos/juego3.php",
+                                "link" => "../juegos/desafioTech.php",
                                 "color" => "info"
                             ]
                         ];

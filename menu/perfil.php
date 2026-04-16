@@ -147,6 +147,8 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
             border-radius: 12px;
             margin-right: 15px;
         }
+        .text-primary { color: #4e73df !important; }
+        .text-secondary { color: #858796 !important; }
     </style>
 </head>
 
