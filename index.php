@@ -290,7 +290,7 @@
                 <img src="img/logo.png" class="img-logo-main" style="height: 170px;">
             </div>
             <h1 class="main-title">IntegraGames</h1>
-            <p class="subtitle">La integración de la carrera a través del juego [cite: 6]</p>
+            <p class="subtitle">La integración de la carrera a través del juego</p>
         </div>
 
         <!-- Características -->
