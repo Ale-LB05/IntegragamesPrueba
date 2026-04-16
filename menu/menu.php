@@ -265,8 +265,8 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                                 "color" => "info"
                             ],
                             [
-                                "nombre" => "Juego 3",
-                                "imagen" => "../img/juego3.jpg",
+                                "nombre" => "DesafioTech",
+                                "imagen" => "../img/desafioTech/desafioTech.png",
                                 "descripcion" => "Aprende las reglas básicas y diviértete compitiendo.",
                                 "link" => "../juegos/desafioTech.php",
                                 "color" => "info"

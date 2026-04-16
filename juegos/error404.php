@@ -106,7 +106,7 @@ $rol = $_SESSION['rol'];
                             "Pon a prueba tu lógica.",
                             "Ideal para aprender jugando."
                         ],
-                        "link" => "juego1.php"
+                        "link" => "../juegos/error404/index.html"
                     ];
                     ?>
 

@@ -103,12 +103,12 @@ $rol = $_SESSION['rol'];
 
                     <?php
                     $juego = [
-                        "nombre" => "Error 404",
+                        "nombre" => "DesafioTech",
                         "imagenes" => [
-                            "../img/uno/uno.png",
-                            "../img/uno/uno.2.png",
-                            "../img/uno/uno.3.png",
-                            "../img/uno/uno.4.png"
+                            "../img/desafioTech/desafioTech.png",
+                            "../img/desafioTech/desafioTech.2.png",
+                            "../img/desafioTech/desafioTech.3.png",
+                            "../img/desafioTech/desafioTech.4.png"
                         ],
                         "descripcion" => [
                             "Error 404 es un juego de cartas.",
@@ -116,7 +116,7 @@ $rol = $_SESSION['rol'];
                             "Pon a prueba tu lógica.",
                             "Ideal para aprender jugando."
                         ],
-                        "link" => "juego1.php"
+                        "link" => "../juegos/desafioTech/index.html"
                     ];
                     ?>
 
