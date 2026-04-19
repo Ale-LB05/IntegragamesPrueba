@@ -41,6 +41,8 @@ $res = $conn->query($sql);
     <link href="../css/styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+
     <style>
         body {
             background: #eef4ff;
@@ -78,7 +80,7 @@ $res = $conn->query($sql);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
-            border: none;
+            border: none !important;
             padding: 15px;
         }
 
@@ -97,6 +99,26 @@ $res = $conn->query($sql);
         }
         
         .rounded-pill { border-radius: 50rem !important; }
+
+        /* Controles de DataTables (Buscador oculto) */
+        .dataTables_wrapper .dataTables_filter {
+            display: none;
+        }
+        
+        .dataTables_wrapper .dataTables_length select {
+            border-radius: 10px;
+            border: 1px solid #d1d3e2;
+        }
+
+        /* Color Negro para letras de paginación */
+        .page-item .page-link {
+            color: #333333 !important;
+        }
+        .page-item.active .page-link {
+            background-color: #4e73df !important;
+            border-color: #4e73df !important;
+            color: #ffffff !important;
+        }
     </style>
 </head>
 
@@ -120,7 +142,7 @@ $res = $conn->query($sql);
                                 <div class="input-group-prepend">
                                     <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-primary"></i></span>
                                 </div>
-                                <input type="text" id="buscador" class="form-control border-left-0" placeholder="Buscar evento, responsable o lugar...">
+                                <input type="text" id="buscadorPersonalizado" class="form-control border-left-0" placeholder="Buscar evento, responsable o lugar...">
                             </div>
 
                             <button onclick="confirmarExportacion()" class="btn btn-success mb-2 rounded-pill px-4 shadow-sm fw-bold">
@@ -138,7 +160,7 @@ $res = $conn->query($sql);
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table text-left" id="tablaRegistros">
+                            <table class="table text-left w-100" id="tablaRegistros">
                                 <thead>
                                     <tr>
                                         <th class="pl-4">Nombre del Evento</th>
@@ -149,15 +171,6 @@ $res = $conn->query($sql);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if ($res->num_rows == 0) { ?>
-                                        <tr>
-                                            <td colspan="5" class="text-center py-5 text-muted">
-                                                <i class="fas fa-folder-open fa-3x mb-3" style="color: #cbd5e1;"></i><br>
-                                                No hay registros disponibles en el historial.
-                                            </td>
-                                        </tr>
-                                    <?php } ?>
-                                    
                                     <?php while ($row = $res->fetch_assoc()) { ?>
                                         <tr>
                                             <td class="pl-4">
@@ -207,15 +220,34 @@ $res = $conn->query($sql);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
 
-    <script>
-        // Buscador Dinámico Fluido
-        document.getElementById("buscador").addEventListener("keyup", function() {
-            let filtro = this.value.toLowerCase();
-            let filas = document.querySelectorAll("#tablaRegistros tbody tr");
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
-            filas.forEach(fila => {
-                let textoFila = fila.textContent.toLowerCase();
-                fila.style.display = textoFila.includes(filtro) ? "" : "none";
+    <script>
+        $(document).ready(function() {
+            // Inicializar DataTables
+            var table = $('#tablaRegistros').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ eventos",
+                    "zeroRecords": "No se encontraron registros",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay datos disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ totales)",
+                    "search": "",
+                    "paginate": {
+                        "first": "Primera",
+                        "last": "Última",
+                        "next": "Siguiente >",
+                        "previous": "< Anterior"
+                    }
+                }
+            });
+
+            // Enlazar el buscador personalizado con DataTables
+            $('#buscadorPersonalizado').on('keyup', function () {
+                table.search(this.value).draw();
             });
         });
 
@@ -255,6 +287,11 @@ $res = $conn->query($sql);
         }
 
         function ejecutarExportacion() {
+            // Destruimos la inicialización de DataTables temporalmente para exportar TODAS las filas (y no solo las de la página 1)
+            if ($.fn.DataTable.isDataTable('#tablaRegistros')) {
+                $('#tablaRegistros').DataTable().destroy();
+            }
+
             // Clonamos la tabla para no afectar la vista original al quitar íconos
             let tablaOriginal = document.getElementById("tablaRegistros");
             let tablaClon = tablaOriginal.cloneNode(true);
@@ -264,7 +301,7 @@ $res = $conn->query($sql);
             iconos.forEach(icono => icono.remove());
 
             let tableHTML = tablaClon.outerHTML;
-            let estilo = "<style>table { font-family: Arial; } th { background-color: #4e73df; color: white; padding: 10px; } td { padding: 8px; border: 1px solid #dddddd; }</style>";
+            let estilo = "<style>table { font-family: Arial; } th { background-color: #4e73df; color: white; padding: 10px; text-transform: uppercase; font-size: 12px; } td { padding: 8px; border: 1px solid #dddddd; font-size: 14px; }</style>";
             
             // Reemplazar espacios y tildes para evitar errores de codificación
             let uri = 'data:application/vnd.ms-excel;base64,';
@@ -281,6 +318,26 @@ $res = $conn->query($sql);
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+
+            // Volvemos a inicializar DataTables después de exportar
+            var table = $('#tablaRegistros').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "Todos"]],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ eventos",
+                    "zeroRecords": "No se encontraron registros",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay datos disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ totales)",
+                    "search": "",
+                    "paginate": {
+                        "first": "Primera",
+                        "last": "Última",
+                        "next": "Siguiente >",
+                        "previous": "< Anterior"
+                    }
+                }
+            });
 
             Swal.fire({
                 icon: 'success',

@@ -12,7 +12,6 @@
 </head>
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-    <!-- BRAND -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../menu/panel.php">
         <div class="sidebar-brand-icon">
             <i class="fas fa-gamepad"></i>
@@ -22,7 +21,6 @@
 
     <hr class="sidebar-divider my-0">
 
-    <!-- INICIO -->
     <li class="nav-item active">
         <a class="nav-link" href="../menu/menu.php">
             <i class="fas fa-home"></i>
@@ -45,8 +43,7 @@
             Administración
         </div>
 
-        <!-- PERSONAL (solo admin) -->
-        <?php if ($esAdmin) { ?>
+        <?php if ($esAdmin || $esProgramador) { ?>
             <li class="nav-item">
                 <a class="nav-link" href="../cruds/personal.php">
                     <i class="fas fa-user"></i>
@@ -55,7 +52,6 @@
             </li>
         <?php } ?>
 
-        <!-- EVENTOS (admin, programador, promotor) -->
         <?php if ($esAdmin || $esProgramador || $esPromotor) { ?>
             <li class="nav-item">
                 <a class="nav-link" href="../cruds/eventos.php">
@@ -65,8 +61,7 @@
             </li>
         <?php } ?>
 
-        <!-- ESCUELAS (admin y programador) -->
-        <?php if ($esAdmin || $esProgramador) { ?>
+        <?php if ($esAdmin || $esProgramador || $esPromotor) { ?>
             <li class="nav-item">
                 <a class="nav-link" href="../registroEscuela/escuelas.php">
                     <i class="fas fa-school"></i>
@@ -75,8 +70,7 @@
             </li>
         <?php } ?>
 
-        <!-- HISTORIAL (admin y programador) -->
-        <?php if ($esAdmin || $esProgramador) { ?>
+        <?php if ($esAdmin || $esProgramador || $esPromotor) { ?>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUsuarios"
                     aria-expanded="false" aria-controls="collapseUsuarios">
@@ -103,7 +97,6 @@
 
     <hr class="sidebar-divider">
 
-    <!-- INFORMACIÓN -->
     <div class="sidebar-heading">
         Información
     </div>
@@ -118,7 +111,6 @@
 
     <hr class="sidebar-divider">
 
-    <!-- CONTACTO -->
     <div class="sidebar-heading">
         Contacto
     </div>
@@ -146,13 +138,12 @@
 
     <hr class="sidebar-divider">
 
-    <!-- SESIÓN -->
     <div class="sidebar-heading">
         Sesión
     </div>
 
     <li class="nav-item">
-        <a class="nav-link" href="../index.php">
+        <a class="nav-link" href="#" onclick="confirmarSalirSidebar(event)">
             <i class="fas fa-sign-out-alt"></i>
             <span>Salir</span>
         </a>
@@ -160,10 +151,37 @@
 
     <hr class="sidebar-divider d-none d-md-block">
 
-    <!-- TOGGLE (MINIMIZAR) -->
     <div class="text-center d-none d-md-inline">
         <button class="rounded-circle border-0" id="sidebarToggle"></button>
     </div>
 
-
 </ul>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmarSalirSidebar(event) {
+        event.preventDefault(); // Evita la recarga inmediata de la página
+
+        Swal.fire({
+            title: '¿Cerrar sesión?',
+            text: "¿Estás seguro de que deseas salir del sistema?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e74a3b', // Color rojo característico de salida
+            cancelButtonColor: '#858796', // Gris para cancelar
+            confirmButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Sí, salir',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            customClass: {
+                confirmButton: 'rounded-pill px-4 shadow-sm',
+                cancelButton: 'rounded-pill px-4'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Mantuve la ruta que tenías originalmente en tu código (../index.php)
+                // Si necesitas que cierre la sesión en backend, podrías cambiarlo a '../RegistroAdmin/logout.php'
+                window.location.href = '../index.php';
+            }
+        });
+    }
+</script>

@@ -147,8 +147,14 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
             border-radius: 12px;
             margin-right: 15px;
         }
-        .text-primary { color: #4e73df !important; }
-        .text-secondary { color: #858796 !important; }
+
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-secondary {
+            color: #858796 !important;
+        }
     </style>
 </head>
 
@@ -171,7 +177,12 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
                                 </button>
                             </div>
                             <div class="mt-3">
-                                <h5 class="fw-bold mb-0 text-dark"><?= htmlspecialchars($user['nombre']) ?></h5>
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <h5 class="fw-bold mb-0 text-dark mr-2"><?= htmlspecialchars($user['nombre']) ?></h5>
+                                    <button class="btn btn-outline-primary btn-sm rounded-circle" data-toggle="modal" data-target="#modalNombre" title="Editar nombre">
+                                        <i class="fas fa-pen" style="font-size: 0.7rem;"></i>
+                                    </button>
+                                </div>
                                 <span class="badge px-3 py-2 mt-2 rounded-pill bg-light text-primary border"><i class="fas fa-user-tag mr-1"></i> <?= ucfirst($rol) ?></span>
                             </div>
                         </div>
@@ -255,6 +266,32 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
             <?php include("../menu/php/piePagina.php"); ?>
         </div>
     </div>
+    <div class="modal fade" id="modalNombre" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="POST" action="php/actualizar_perfil.php" class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="mb-0 fw-bold"><i class="fas fa-user-edit mr-2"></i> Editar Nombre</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body p-4">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: #4e73df;">
+                        <i class="fas fa-id-card mr-1"></i> Actualización de Identidad
+                    </h6>
+                    <label class="fw-bold text-muted small">Nuevo Nombre de Usuario</label>
+                    <div class="input-group mb-2">
+                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user"></i></span>
+                        <input type="text" name="nombre" class="form-control border-left-0" placeholder="Ej: JuanPerez" value="<?= htmlspecialchars($user['nombre']) ?>" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-outline-danger px-4 rounded-pill" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info px-4 rounded-pill shadow-sm text-white fw-bold">
+                        <i class="fas fa-save mr-2"></i> Actualizar Nombre
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="modal fade" id="modalFoto" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -303,6 +340,7 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
                         <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-envelope"></i></span>
                         <input type="email" name="correo" class="form-control border-left-0" placeholder="Ej: nuevo@correo.com" value="<?= htmlspecialchars($user['correo']) ?>" required>
                     </div>
+
                     <input type="hidden" name="nombre" value="<?= htmlspecialchars($user['nombre']) ?>">
                 </div>
                 <div class="modal-footer bg-light border-top-0">
@@ -403,6 +441,17 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
                     });
                     return false;
                 }
+            });
+
+            // Cargar estado al enviar formularios (excepto foto para que no estorbe)
+            $('form:not([enctype="multipart/form-data"])').on('submit', function() {
+                Swal.fire({
+                    title: 'Guardando...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading()
+                    }
+                });
             });
         });
 

@@ -59,7 +59,8 @@ $json_ocupaciones = json_encode($ocupaciones);
 if (isset($_POST['crear'])) {
     $nombre = $conn->real_escape_string($_POST['nombre_evento']);
     $fecha = $conn->real_escape_string($_POST['fecha']);
-    $hora = !empty($_POST['hora']) ? $conn->real_escape_string($_POST['hora']) : "00:00:00";
+    $hora_inicio = !empty($_POST['hora_inicio']) ? $conn->real_escape_string($_POST['hora_inicio']) : "00:00:00";
+    $hora_fin = !empty($_POST['hora_fin']) ? $conn->real_escape_string($_POST['hora_fin']) : "00:00:00";
     $lugar = $conn->real_escape_string($_POST['lugar']);
     $ubicacion = $conn->real_escape_string($_POST['ubicacion']);
     $observaciones = $conn->real_escape_string($_POST['observaciones']);
@@ -74,8 +75,8 @@ if (isset($_POST['crear'])) {
         move_uploaded_file($_FILES['imagen']['tmp_name'], $directorio . $imagenNombre);
     }
 
-    $sql = "INSERT INTO evento (nombre_evento, fecha, hora, lugar, ubicacion, observaciones, imagen)
-            VALUES ('$nombre', '$fecha', '$hora', '$lugar', '$ubicacion', '$observaciones', '$imagenNombre')";
+    $sql = "INSERT INTO evento (nombre_evento, fecha, hora_inicio, hora_fin, lugar, ubicacion, observaciones, imagen)
+            VALUES ('$nombre', '$fecha', '$hora_inicio', '$hora_fin', '$lugar', '$ubicacion', '$observaciones', '$imagenNombre')";
 
     if ($conn->query($sql)) {
         $mensaje = "¡Evento creado con éxito!";
@@ -98,7 +99,8 @@ if (isset($_POST['editar'])) {
     } else {
         $nombre = $_POST['nombre_evento'];
         $fecha = $_POST['fecha'];
-        $hora = $_POST['hora'];
+        $hora_inicio = $_POST['hora_inicio'];
+        $hora_fin = $_POST['hora_fin'];
         $lugar = $_POST['lugar'];
         $ubicacion = $_POST['ubicacion'];
         $observaciones = $_POST['observaciones'];
@@ -113,7 +115,8 @@ if (isset($_POST['editar'])) {
         $sql = "UPDATE evento SET 
                 nombre_evento='$nombre',
                 fecha='$fecha',
-                hora='$hora',
+                hora_inicio='$hora_inicio',
+                hora_fin='$hora_fin',
                 lugar='$lugar',
                 ubicacion='$ubicacion',
                 observaciones='$observaciones',
@@ -345,7 +348,7 @@ $sqlPasados = "SELECT e.*, er.id_responsable, r.nombre AS nombre_responsable
                                                             <i class="fas fa-calendar-day mr-1" style="color: #4e73df;"></i> <?= date("d/m/Y", strtotime($row["fecha"])) ?>
                                                         </span>
                                                         <span class="text-muted small">
-                                                            <i class="fas fa-clock mr-1" style="color: #4e73df;"></i> <?= date("h:i A", strtotime($row["hora"])) ?>
+                                                            <i class="fas fa-clock mr-1" style="color: #4e73df;"></i> <?= date("h:i A", strtotime($row["hora_inicio"])) ?> - <?= date("h:i A", strtotime($row["hora_fin"])) ?>
                                                         </span>
                                                         <span class="text-muted small">
                                                             <i class="fas fa-map-marker-alt mr-1" style="color: #e74a3b;"></i> <?= htmlspecialchars($row["lugar"] ?? '') ?>
@@ -373,7 +376,7 @@ $sqlPasados = "SELECT e.*, er.id_responsable, r.nombre AS nombre_responsable
 
                                                     <button class="btn btn-info btn-sm text-white rounded-circle shadow-sm"
                                                         data-toggle="modal" data-target="#modalEditar" title="Editar Evento"
-                                                        onclick="editarEvento('<?= $row['id_evento'] ?>','<?= htmlspecialchars($row['nombre_evento'] ?? '', ENT_QUOTES) ?>','<?= $row['fecha'] ?>','<?= $row['hora'] ?>','<?= htmlspecialchars($row['lugar'] ?? '', ENT_QUOTES) ?>','<?= htmlspecialchars($row['ubicacion'] ?? '', ENT_QUOTES) ?>','<?= htmlspecialchars($row['observaciones'] ?? '', ENT_QUOTES) ?>','<?= $imagen ?>')">
+                                                        onclick="editarEvento('<?= $row['id_evento'] ?>','<?= htmlspecialchars($row['nombre_evento'] ?? '', ENT_QUOTES) ?>','<?= $row['fecha'] ?>','<?= $row['hora_inicio'] ?>','<?= $row['hora_fin'] ?>','<?= htmlspecialchars($row['lugar'] ?? '', ENT_QUOTES) ?>','<?= htmlspecialchars($row['ubicacion'] ?? '', ENT_QUOTES) ?>','<?= htmlspecialchars($row['observaciones'] ?? '', ENT_QUOTES) ?>','<?= $imagen ?>')">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
                                                     
@@ -416,14 +419,17 @@ $sqlPasados = "SELECT e.*, er.id_responsable, r.nombre AS nombre_responsable
                                                     
                                                     <div class="d-flex flex-wrap align-items-center mb-2" style="gap: 15px;">
                                                         <span class="text-muted small"><i class="fas fa-calendar-day mr-1"></i> <?= date("d/m/Y", strtotime($row["fecha"])) ?></span>
-                                                        <span class="text-muted small"><i class="fas fa-clock mr-1"></i> <?= date("h:i A", strtotime($row["hora"])) ?></span>
+                                                        <span class="text-muted small"><i class="fas fa-clock mr-1"></i> <?= date("h:i A", strtotime($row["hora_inicio"])) ?> - <?= date("h:i A", strtotime($row["hora_fin"])) ?></span>
                                                         <span class="text-muted small"><i class="fas fa-map-marker-alt mr-1"></i> <?= htmlspecialchars($row["lugar"] ?? '') ?></span>
                                                     </div>
 
-                                                    <div>
+                                                    <div class="d-flex align-items-center mt-2">
                                                         <span class="badge bg-white text-secondary border px-3 py-1 rounded-pill">
                                                             <i class="fas fa-user-check mr-1"></i> Asignado a: <?= htmlspecialchars($row["nombre_responsable"] ?? 'Nadie') ?>
                                                         </span>
+                                                        <button class="btn btn-outline-info btn-sm rounded-pill ml-3 shadow-sm" onclick="verInfoPasado('<?= $row['id_evento'] ?>')">
+                                                            <i class="fas fa-info-circle mr-1"></i> Ver detalles
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -438,6 +444,20 @@ $sqlPasados = "SELECT e.*, er.id_responsable, r.nombre AS nombre_responsable
                 </div>
             </div>
             <?php include("../menu/php/piePagina.php"); ?>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalInfoPasado" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-4">
+                <div class="modal-header bg-primary text-white rounded-top-4">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-chart-bar mr-2"></i> Detalles del Evento</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">×</button>
+                </div>
+                <div class="modal-body p-4" id="contenidoInfoPasado">
+                    <div class="text-center py-4"><div class="spinner-border text-primary"></div></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -457,16 +477,22 @@ $sqlPasados = "SELECT e.*, er.id_responsable, r.nombre AS nombre_responsable
                         <input type="text" name="nombre_evento" class="form-control border-left-0" placeholder="Ej: Feria de las ciencias" required>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="input-group">
                                 <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-calendar-day"></i></span>
                                 <input type="date" name="fecha" class="form-control border-left-0" required>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="input-group">
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group" title="Hora de inicio">
                                 <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-clock"></i></span>
-                                <input type="time" name="hora" class="form-control border-left-0" required>
+                                <input type="time" name="hora_inicio" class="form-control border-left-0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group" title="Hora de fin">
+                                <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-hourglass-end"></i></span>
+                                <input type="time" name="hora_fin" class="form-control border-left-0" required>
                             </div>
                         </div>
                     </div>
@@ -532,16 +558,22 @@ $sqlPasados = "SELECT e.*, er.id_responsable, r.nombre AS nombre_responsable
                         <input type="text" name="nombre_evento" id="editNombre" class="form-control border-left-0" required>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <div class="input-group">
                                 <span class="input-group-text bg-light text-info border-right-0"><i class="fas fa-calendar-day"></i></span>
                                 <input type="date" name="fecha" id="editFecha" class="form-control border-left-0" required>
                             </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="input-group">
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group" title="Hora de inicio">
                                 <span class="input-group-text bg-light text-info border-right-0"><i class="fas fa-clock"></i></span>
-                                <input type="time" name="hora" id="editHora" class="form-control border-left-0" required>
+                                <input type="time" name="hora_inicio" id="editHoraInicio" class="form-control border-left-0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="input-group" title="Hora de fin">
+                                <span class="input-group-text bg-light text-info border-right-0"><i class="fas fa-hourglass-end"></i></span>
+                                <input type="time" name="hora_fin" id="editHoraFin" class="form-control border-left-0" required>
                             </div>
                         </div>
                     </div>
@@ -701,11 +733,13 @@ $sqlPasados = "SELECT e.*, er.id_responsable, r.nombre AS nombre_responsable
             }
         }
 
-        function editarEvento(id, nombre, fecha, hora, lugar, ubicacion, observaciones, imagen) {
+        // FUNCIÓN ACTUALIZADA PARA RECIBIR HORA INICIO Y HORA FIN
+        function editarEvento(id, nombre, fecha, hora_inicio, hora_fin, lugar, ubicacion, observaciones, imagen) {
             document.getElementById('editIdEvento').value = id;
             document.getElementById('editNombre').value = nombre;
             document.getElementById('editFecha').value = fecha;
-            document.getElementById('editHora').value = hora;
+            document.getElementById('editHoraInicio').value = hora_inicio;
+            document.getElementById('editHoraFin').value = hora_fin;
             document.getElementById('editLugar').value = lugar;
             document.getElementById('editUbicacion').value = ubicacion;
             document.getElementById('editObservaciones').value = observaciones;
@@ -751,6 +785,17 @@ $sqlPasados = "SELECT e.*, er.id_responsable, r.nombre AS nombre_responsable
                 didOpen: () => Swal.showLoading()
             });
         });
+
+        // NUEVA FUNCIÓN PARA MOSTRAR DETALLES DEL EVENTO PASADO
+        function verInfoPasado(id) {
+            $('#modalInfoPasado').modal('show');
+            $('#contenidoInfoPasado').html('<div class="text-center py-4"><div class="spinner-border text-primary"></div></div>');
+            
+            // Llama a tu nuevo archivo pasando el ID del evento
+            $.post('obtener_detalle_evento.php', { id_evento: id }, function(data) {
+                $('#contenidoInfoPasado').html(data);
+            });
+        }
     </script>
 </body>
 </html>

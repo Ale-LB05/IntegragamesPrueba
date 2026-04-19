@@ -130,7 +130,8 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                         if (in_array(strtolower($rol), $rolesPermitidos)) {
 
                             $hoy = date("Y-m-d");
-                            $sql = "SELECT nombre_evento, imagen, observaciones, fecha, hora, lugar, ubicacion
+                            /* MODIFICACIÓN: Se cambiaron las columnas de hora por hora_inicio y hora_fin */
+                            $sql = "SELECT nombre_evento, imagen, observaciones, fecha, hora_inicio, hora_fin, lugar, ubicacion
                                     FROM evento
                                     WHERE fecha >= '$hoy'
                                     ORDER BY fecha ASC";
@@ -159,10 +160,10 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                                                         <strong>Fecha:</strong> <?php echo date("d/m/Y", strtotime($evento['fecha'])); ?>
                                                     </p>
 
-                                                    <?php if (!empty($evento['hora'])): ?>
+                                                    <?php if (!empty($evento['hora_inicio']) && !empty($evento['hora_fin'])): ?>
                                                         <p class="text-muted small mb-2">
                                                             <i class="fas fa-clock fa-fw mr-2" style="color: #4e73df;"></i>
-                                                            <strong>Hora:</strong> <?php echo date("h:i A", strtotime($evento['hora'])); ?>
+                                                            <strong>Hora:</strong> <?php echo date("h:i A", strtotime($evento['hora_inicio'])) . " - " . date("h:i A", strtotime($evento['hora_fin'])); ?>
                                                         </p>
                                                     <?php endif; ?>
 
@@ -197,7 +198,7 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                                       </div>";
                             }
 
-                            /* PARTICIPANTE - VE TARJETAS INFORMATIVAS */
+                        /* PARTICIPANTE - VE TARJETAS INFORMATIVAS */
                         } else {
                             $juegosInfo = [
                                 [

@@ -43,13 +43,21 @@ $res = $conn->query($sql);
     <link href="../css/styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+
     <style>
         body {
             background: #eef4ff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .text-primary { color: #4e73df !important; }
-        .text-secondary { color: #858796 !important; }
+
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-secondary {
+            color: #858796 !important;
+        }
 
         .bg-primary {
             background-color: #4e73df !important;
@@ -85,7 +93,7 @@ $res = $conn->query($sql);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
-            border: none;
+            border: none !important;
             padding: 15px;
             vertical-align: middle;
         }
@@ -110,6 +118,27 @@ $res = $conn->query($sql);
         .rounded-pill {
             border-radius: 50rem !important;
         }
+
+        /* Controles de DataTables (Buscador oculto) */
+        .dataTables_wrapper .dataTables_filter {
+            display: none;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border-radius: 10px;
+            border: 1px solid #d1d3e2;
+        }
+
+        /* Color Negro para letras de paginación */
+        .page-item .page-link {
+            color: #333333 !important;
+        }
+
+        .page-item.active .page-link {
+            background-color: #4e73df !important;
+            border-color: #4e73df !important;
+            color: #ffffff !important;
+        }
     </style>
 </head>
 
@@ -123,7 +152,7 @@ $res = $conn->query($sql);
                 <div class="container-fluid">
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
                         <h1 class="h3 text-gray-800 mb-2 fw-bold">
-                            <i class="fas mr-2" "></i> Registros de Participantes
+                            <i class="fas fa-users mr-2"></i> Registros de Participantes
                         </h1>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -131,7 +160,7 @@ $res = $conn->query($sql);
                                 <div class="input-group-prepend">
                                     <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-primary"></i></span>
                                 </div>
-                                <input type="text" id="buscador" class="form-control border-left-0" placeholder="Buscar participante, evento o escuela...">
+                                <input type="text" id="buscadorPersonalizado" class="form-control border-left-0" placeholder="Buscar participante, evento o escuela...">
                             </div>
 
                             <button onclick="confirmarExportacion()" class="btn btn-success mb-2 rounded-pill px-4 shadow-sm fw-bold">
@@ -149,7 +178,7 @@ $res = $conn->query($sql);
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table text-left" id="tablaParticipantes">
+                            <table class="table text-left w-100" id="tablaParticipantes">
                                 <thead>
                                     <tr>
                                         <th class="pl-4">Nombre</th>
@@ -163,15 +192,6 @@ $res = $conn->query($sql);
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if ($res->num_rows == 0) : ?>
-                                        <tr>
-                                            <td colspan="8" class="text-center py-5 text-muted">
-                                                <i class="fas fa-folder-open fa-3x mb-3" style="color: #cbd5e1;"></i><br>
-                                                Aún no hay encuestas ni participantes registrados.
-                                            </td>
-                                        </tr>
-                                    <?php endif; ?>
-
                                     <?php while ($row = $res->fetch_assoc()) : ?>
                                         <tr>
                                             <td class="pl-4 fw-bold text-dark">
@@ -204,12 +224,20 @@ $res = $conn->query($sql);
                                             <td class="text-center">
                                                 <?php
                                                 $cal = $row['calificacion'];
-                                                if ($cal >= 4) {
-                                                    echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #1cc88a; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
-                                                } elseif ($cal == 3) {
-                                                    echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #f6c23e; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
-                                                } elseif ($cal !== null) {
-                                                    echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #e74a3b; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
+
+                                                if ($cal !== null) {
+                                                    // VERDE: 8 a 10
+                                                    if ($cal >= 8) {
+                                                        echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #1cc88a; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
+                                                    }
+                                                    // AMARILLO: 3 a 7
+                                                    elseif ($cal >= 3 && $cal <= 7) {
+                                                        echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #f6c23e; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
+                                                    }
+                                                    // ROJO: 0 a 2
+                                                    else {
+                                                        echo "<span class='badge px-3 py-2 rounded-pill shadow-sm' style='background-color: #e74a3b; color: white; font-size: 0.85rem;'>$cal <i class='fas fa-star ml-1'></i></span>";
+                                                    }
                                                 } else {
                                                     echo '<span class="text-muted">-</span>';
                                                 }
@@ -231,18 +259,46 @@ $res = $conn->query($sql);
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
+
     <script>
-        // Buscador Dinámico
-        document.getElementById("buscador").addEventListener("keyup", function() {
-            let filtro = this.value.toLowerCase();
-            let filas = document.querySelectorAll("#tablaParticipantes tbody tr");
-            filas.forEach(fila => {
-                let texto = fila.textContent.toLowerCase();
-                fila.style.display = texto.includes(filtro) ? "" : "none";
+        $(document).ready(function() {
+            // Inicializar DataTables
+            var table = $('#tablaParticipantes').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [
+                    [5, 10, 25, 50, -1],
+                    [5, 10, 25, 50, "Todos"]
+                ],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "zeroRecords": "No se encontraron registros",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay datos disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ totales)",
+                    "search": "",
+                    "paginate": {
+                        "first": "Primera",
+                        "last": "Última",
+                        "next": "Siguiente >",
+                        "previous": "< Anterior"
+                    }
+                }
+            });
+
+            // Enlazar el buscador personalizado con DataTables
+            $('#buscadorPersonalizado').on('keyup', function() {
+                table.search(this.value).draw();
             });
         });
 
-        // VALIDACIÓN Y EXPORTACIÓN MEJORADA (Mismos estilos que Historial)
+        // VALIDACIÓN Y EXPORTACIÓN MEJORADA
         function confirmarExportacion() {
             Swal.fire({
                 title: '¿Exportar a Excel?',
@@ -278,6 +334,11 @@ $res = $conn->query($sql);
         }
 
         function ejecutarExportacion() {
+            // Destruimos la inicialización de DataTables temporalmente para exportar TODAS las filas
+            if ($.fn.DataTable.isDataTable('#tablaParticipantes')) {
+                $('#tablaParticipantes').DataTable().destroy();
+            }
+
             // Clonamos la tabla para limpiarla antes de exportar
             let tablaOriginal = document.getElementById("tablaParticipantes");
             let tablaClon = tablaOriginal.cloneNode(true);
@@ -313,6 +374,29 @@ $res = $conn->query($sql);
             a.click();
             document.body.removeChild(a);
 
+            // Volvemos a inicializar DataTables después de exportar
+            var table = $('#tablaParticipantes').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [
+                    [5, 10, 25, 50, -1],
+                    [5, 10, 25, 50, "Todos"]
+                ],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "zeroRecords": "No se encontraron registros",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay datos disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ totales)",
+                    "search": "",
+                    "paginate": {
+                        "first": "Primera",
+                        "last": "Última",
+                        "next": "Siguiente >",
+                        "previous": "< Anterior"
+                    }
+                }
+            });
+
             Swal.fire({
                 icon: 'success',
                 title: '¡Descarga Exitosa!',
@@ -321,11 +405,6 @@ $res = $conn->query($sql);
             });
         }
     </script>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
 </body>
 
 </html>

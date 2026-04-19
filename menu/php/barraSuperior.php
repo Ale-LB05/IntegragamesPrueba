@@ -25,7 +25,6 @@ if ($_SESSION['rol'] != "participante") {
 
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
 
-    <!-- IZQUIERDA -->
     <div class="d-flex align-items-center">
 
         <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-2">
@@ -34,38 +33,18 @@ if ($_SESSION['rol'] != "participante") {
 
         <img src="../img/logo.png" style="height: 70px;">
     </div>
-    
-    <!-- DERECHA -->
+
     <ul class="navbar-nav ml-auto">
-
-        <!-- ALERTAS -->
-        <li class="nav-item dropdown no-arrow mx-1">
-            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                <i class="fas fa-bell fa-fw"></i>
-                <span class="badge badge-danger badge-counter">3+</span>
-            </a>
-        </li>
-
-        <!-- MENSAJES -->
-        <li class="nav-item dropdown no-arrow mx-1">
-            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
-                <i class="fas fa-envelope fa-fw"></i>
-                <span class="badge badge-danger badge-counter">7</span>
-            </a>
-        </li>
 
         <div class="topbar-divider d-none d-sm-block"></div>
 
-        <!-- USUARIO -->
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-toggle="dropdown">
 
-                <!-- NOMBRE -->
                 <span class="mr-2 d-none d-lg-inline text-gray-600 small">
                     <?= $_SESSION['usuario'] . " - " . $_SESSION['rol']; ?>
                 </span>
 
-                <!-- FOTO / ICONO -->
                 <?php if ($_SESSION['rol'] != "participante") { ?>
 
                     <img src="<?= $fotoUsuario ?>"
@@ -81,23 +60,52 @@ if ($_SESSION['rol'] != "participante") {
 
             </a>
             <?php if ($esAdmin || $esProgramador || $esPromotor) { ?>
-            <!-- DROPDOWN -->
-            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
 
-                <a class="dropdown-item" href="../menu/perfil.php">
-                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Perfil
-                </a>
+                    <a class="dropdown-item" href="../menu/perfil.php">
+                        <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                        Perfil
+                    </a>
 
-                <a class="dropdown-item" href="../RegistroAdmin/logout.php">
-                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Cerrar sesión
-                </a>
+                    <a class="dropdown-item" href="#" onclick="confirmarCerrarSesion(event)">
+                        <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                        Cerrar sesión
+                    </a>
 
-            </div>
+                </div>
             <?php } ?>
         </li>
 
     </ul>
-    
+
 </nav>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    // Función para confirmar el cierre de sesión
+    function confirmarCerrarSesion(event) {
+        event.preventDefault(); // Evita que el enlace intente navegar a "#"
+
+        Swal.fire({
+            title: '¿Cerrar sesión?',
+            text: "¿Estás seguro de que deseas salir de tu cuenta?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#e74a3b', // Color rojo para acción destructiva/salir
+            cancelButtonColor: '#858796', // Color gris para cancelar
+            confirmButtonText: '<i class="fas fa-sign-out-alt mr-1"></i> Sí, salir',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+            customClass: {
+                confirmButton: 'rounded-pill px-4 shadow-sm',
+                cancelButton: 'rounded-pill px-4'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Si el usuario confirma, lo redirigimos al script que destruye la sesión
+                window.location.href = '../RegistroAdmin/logout.php';
+            }
+        });
+    }
+</script>

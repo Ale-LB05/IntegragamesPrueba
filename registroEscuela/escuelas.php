@@ -65,6 +65,34 @@ if (isset($_POST['actualizar'])) {
     }
 }
 
+/* ELIMINAR (CON VALIDACIÓN DE HISTORIAL) */
+if (isset($_POST['eliminar'])) {
+    $id = intval($_POST['id']);
+
+    // Primero verificamos si la escuela está siendo usada en la tabla de participantes
+    $check = $conn->prepare("SELECT id_participante FROM participante WHERE id_escuela = ? LIMIT 1");
+    $check->bind_param("i", $id);
+    $check->execute();
+    $check->store_result();
+
+    if ($check->num_rows > 0) {
+        // Si hay registros, bloqueamos la eliminación
+        $mensaje = "No se puede eliminar. La escuela tiene registros en el historial de eventos.";
+        $tipo = "error";
+    } else {
+        // Si no hay registros, procedemos a borrar
+        $stmt = $conn->prepare("DELETE FROM escuela WHERE id_escuela = ?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            $mensaje = "Escuela eliminada correctamente.";
+            $tipo = "success";
+        } else {
+            $mensaje = "Error al eliminar la escuela.";
+            $tipo = "error";
+        }
+    }
+}
+
 /* CONSULTA */
 $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
 ?>
@@ -78,18 +106,24 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
     <link href="../css/styles.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+
     <style>
         body {
             background: #eef4ff;
         }
-        .text-primary { color: #4e73df !important; }
-        .text-secondary { color: #858796 !important; }
+
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-secondary {
+            color: #858796 !important;
+        }
 
         .bg-primary {
             background-color: #4e73df !important;
         }
-
-        /* Azul SB Admin */
 
         .card {
             transition: box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
@@ -122,7 +156,10 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
         .table thead {
             background: #4e73df;
             color: white;
-            border-radius: 10px 10px 0 0;
+        }
+
+        .table thead th {
+            border-bottom: none !important;
         }
 
         .table th,
@@ -132,6 +169,29 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
 
         .table tbody tr:hover {
             background-color: #f8f9fc;
+        }
+
+        /* Ocultar el buscador nativo de DataTables ya que usaremos el personalizado */
+        .dataTables_wrapper .dataTables_filter {
+            display: none;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            border-radius: 10px;
+            border: 1px solid #d1d3e2;
+        }
+
+        /* Color Negro para letras de paginación */
+        .page-item .page-link {
+            color: #333333 !important;
+            /* Letras negras/oscuras */
+        }
+
+        .page-item.active .page-link {
+            background-color: #4e73df !important;
+            border-color: #4e73df !important;
+            color: #ffffff !important;
+            /* Blanco solo para la página seleccionada */
         }
     </style>
 </head>
@@ -144,25 +204,26 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                 <?php include("../menu/php/barraSuperior.php"); ?>
 
                 <div class="container-fluid">
+
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-                        <h1 class="h3 text-gray-800 mb-2">Gestión de Escuelas</h1>
+                        <h1 class="h3 text-gray-800 mb-2 fw-bold">Gestión de Escuelas</h1>
                         <div class="d-flex align-items-center flex-wrap">
-                            <div class="input-group mr-2 mb-2" style="width: 400px;">
+                            <div class="input-group mr-2 mb-2" style="width: 350px;">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white"><i class="fas fa-search text-primary"></i></span>
+                                    <span class="input-group-text bg-white border-right-0"><i class="fas fa-search text-primary"></i></span>
                                 </div>
-                                <input type="text" id="buscador" class="form-control border-left-0" placeholder="Buscar escuela...">
+                                <input type="text" id="buscadorPersonalizado" class="form-control border-left-0" placeholder="Buscar escuela...">
                             </div>
-                            <button class="btn btn-success mb-2 shadow-sm" data-toggle="modal" data-target="#modalAgregar">
+                            <button class="btn btn-success mb-2 shadow-sm rounded-pill px-4" data-toggle="modal" data-target="#modalAgregar">
                                 <i class="fas fa-plus mr-1"></i> Nueva Escuela
                             </button>
                         </div>
                     </div>
 
                     <div class="card shadow mb-4">
-                        <div class="card-body">
+                        <div class="card-body p-4">
                             <div class="table-responsive">
-                                <table class="table table-bordered text-center" id="tablaEscuelas">
+                                <table class="table table-bordered text-center w-100" id="tablaEscuelas">
                                     <thead>
                                         <tr>
                                             <th>Nombre de la Escuela</th>
@@ -173,17 +234,9 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php if ($res->num_rows == 0) : ?>
-                                            <tr>
-                                                <td colspan="5" class="py-4 text-muted">
-                                                    <i class="fas fa-school fa-2x mb-2" style="color: #cbd5e1;"></i><br>
-                                                    Aún no hay escuelas registradas
-                                                </td>
-                                            </tr>
-                                        <?php endif; ?>
                                         <?php while ($row = $res->fetch_assoc()) : ?>
                                             <tr>
-                                                <td class="align-middle fw-bold text-dark text-light pl-4">
+                                                <td class="align-middle fw-bold text-dark text-left pl-4">
                                                     <?= htmlspecialchars($row['nombre_escuela']) ?>
                                                 </td>
 
@@ -191,21 +244,21 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                                                     <?= htmlspecialchars($row['contacto']) ?>
                                                 </td>
 
-                                                <td class="align-middle text-muted">
+                                                <td class="align-middle text-muted text-left">
                                                     <small><?= htmlspecialchars($row['direccion']) ?></small>
                                                 </td>
 
                                                 <td class="align-middle">
                                                     <span class="badge bg-light text-dark border px-3 py-2 rounded-pill" style="font-weight: 500; font-size: 0.85rem;">
-                                                        <?= $row['telefono'] ?>
+                                                        <i class="fas fa-phone-alt mr-1 text-success small"></i> <?= $row['telefono'] ?>
                                                     </span>
                                                 </td>
 
                                                 <td class="align-middle">
-                                                    <button class="btn btn-info btn-sm shadow-sm rounded-pill px-3"
+                                                    <button class="btn btn-info btn-sm shadow-sm rounded-circle"
                                                         data-toggle="modal"
                                                         data-target="#modalEditar"
-                                                        title="Editar datos de la escuela"
+                                                        title="Editar escuela"
                                                         onclick="editarEscuela(
                                                         '<?= $row['id_escuela'] ?>',
                                                         '<?= htmlspecialchars($row['nombre_escuela'], ENT_QUOTES) ?>',
@@ -214,6 +267,12 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                                                         '<?= $row['telefono'] ?>'
                                                     )">
                                                         <i class="fas fa-edit"></i>
+                                                    </button>
+
+                                                    <button class="btn btn-danger btn-sm shadow-sm rounded-circle ml-1"
+                                                        title="Eliminar escuela"
+                                                        onclick="eliminarEscuela('<?= $row['id_escuela'] ?>', '<?= htmlspecialchars($row['nombre_escuela'], ENT_QUOTES) ?>')">
+                                                        <i class="fas fa-trash"></i>
                                                     </button>
                                                 </td>
                                             </tr>
@@ -239,11 +298,9 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                 </div>
 
                 <div class="modal-body p-4">
-
                     <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: #4e73df;">
                         <i class="fas fa-building mr-1"></i> Datos de la Institución
                     </h6>
-
                     <label class="fw-bold text-muted small">Nombre de la Escuela</label>
                     <div class="input-group mb-3">
                         <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-university"></i></span>
@@ -259,7 +316,6 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                     <h6 class="fw-bold mb-3 mt-4 border-bottom pb-2" style="color: #4e73df;">
                         <i class="fas fa-address-book mr-1"></i> Información de Contacto
                     </h6>
-
                     <label class="fw-bold text-muted small">Nombre del Director o Encargado</label>
                     <div class="input-group mb-3">
                         <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user-tie"></i></span>
@@ -279,7 +335,6 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                         <i class="fas fa-save mr-2"></i> Guardar Escuela
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
@@ -288,7 +343,7 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
         <div class="modal-dialog modal-dialog-centered">
             <form method="POST" class="modal-content shadow-lg border-0 rounded-4">
 
-                <div class="modal-header bg-primary text-white rounded-top-4">
+                <div class="modal-header bg-info text-white rounded-top-4">
                     <h5 class="mb-0 fw-bold"><i class="fas fa-edit mr-2"></i> Editar Escuela</h5>
                     <button type="button" class="close text-white" data-dismiss="modal">×</button>
                 </div>
@@ -296,35 +351,33 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                 <div class="modal-body p-4">
                     <input type="hidden" name="id" id="editId">
 
-                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="color: #4e73df;">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2 text-info">
                         <i class="fas fa-building mr-1"></i> Datos de la Institución
                     </h6>
-
                     <label class="fw-bold text-muted small">Nombre de la Escuela</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-university"></i></span>
+                        <span class="input-group-text bg-light border-right-0 text-info"><i class="fas fa-university"></i></span>
                         <input type="text" name="nombre" id="editNombre" class="form-control border-left-0" required>
                     </div>
 
                     <label class="fw-bold text-muted small">Dirección Física</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-map-marker-alt"></i></span>
+                        <span class="input-group-text bg-light border-right-0 text-info"><i class="fas fa-map-marker-alt"></i></span>
                         <textarea name="direccion" id="editDireccion" class="form-control border-left-0" rows="2" required></textarea>
                     </div>
 
-                    <h6 class="fw-bold mb-3 mt-4 border-bottom pb-2" style="color: #4e73df;">
+                    <h6 class="fw-bold mb-3 mt-4 border-bottom pb-2 text-info">
                         <i class="fas fa-address-book mr-1"></i> Información de Contacto
                     </h6>
-
                     <label class="fw-bold text-muted small">Nombre del Director o Encargado</label>
                     <div class="input-group mb-3">
-                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-user-tie"></i></span>
+                        <span class="input-group-text bg-light border-right-0 text-info"><i class="fas fa-user-tie"></i></span>
                         <input type="text" name="contacto" id="editContacto" class="form-control border-left-0" required>
                     </div>
 
                     <label class="fw-bold text-muted small">Teléfono</label>
                     <div class="input-group mb-2">
-                        <span class="input-group-text bg-light border-right-0" style="color: #4e73df;"><i class="fas fa-phone"></i></span>
+                        <span class="input-group-text bg-light border-right-0 text-info"><i class="fas fa-phone"></i></span>
                         <input type="text" name="telefono" id="editTelefono" class="form-control input-telefono border-left-0" maxlength="12" required>
                     </div>
                 </div>
@@ -335,7 +388,6 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                         <i class="fas fa-save mr-2"></i> Guardar Cambios
                     </button>
                 </div>
-
             </form>
         </div>
     </div>
@@ -343,6 +395,9 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
     <script src="../vendor/jquery/jquery.min.js"></script>
     <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="../js/sb-admin-2.min.js"></script>
+
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
     <script>
         function editarEscuela(id, nombre, contacto, direccion, telefono) {
@@ -353,7 +408,30 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
             document.getElementById('editTelefono').value = telefono;
         }
 
-        // Formateo del teléfono a medida que se escribe (Ej: 443 123 4567)
+        // FUNCION PARA ELIMINAR CON SWEETALERT
+        function eliminarEscuela(id, nombre) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Estás a punto de eliminar a " + nombre + ". Si la escuela tiene historial, se bloqueará la acción.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74a3b', // Rojo
+                cancelButtonColor: '#858796', // Gris
+                confirmButtonText: '<i class="fas fa-trash"></i> Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let form = document.createElement("form");
+                    form.method = "POST";
+                    form.innerHTML = `<input type="hidden" name="id" value="${id}"><input type="hidden" name="eliminar" value="1">`;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        // Formateo del teléfono
         document.querySelectorAll('.input-telefono').forEach(input => {
             input.addEventListener('input', function(e) {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
@@ -362,18 +440,48 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
         });
 
         $(document).ready(function() {
+
+            // Inicializar DataTables
+            var table = $('#tablaEscuelas').DataTable({
+                "pageLength": 10,
+                "lengthMenu": [
+                    [5, 10, 25, 50, -1],
+                    [5, 10, 25, 50, "Todas"]
+                ],
+                "language": {
+                    "lengthMenu": "Mostrar _MENU_ escuelas",
+                    "zeroRecords": "No se encontraron escuelas registradas",
+                    "info": "Mostrando página _PAGE_ de _PAGES_",
+                    "infoEmpty": "No hay datos disponibles",
+                    "infoFiltered": "(filtrado de _MAX_ totales)",
+                    "paginate": {
+                        "first": "Primera",
+                        "last": "Última",
+                        "next": "Siguiente >",
+                        "previous": "< Anterior"
+                    }
+                }
+            });
+
+            // Enlazar el buscador personalizado con DataTables
+            $('#buscadorPersonalizado').on('keyup', function() {
+                table.search(this.value).draw();
+            });
+
+            // Alertas SweetAlert
             <?php if (!empty($mensaje)) : ?>
                 Swal.fire({
                     icon: '<?= $tipo ?>',
                     title: '<?= $mensaje ?>',
                     showConfirmButton: false,
-                    timer: 2000
+                    timer: 2500
                 }).then(() => {
                     window.history.replaceState({}, document.title, window.location.pathname);
                 });
             <?php endif; ?>
 
-            $('form').on('submit', function() {
+            // Loader de carga al guardar formularios
+            $('form:not(.search-form)').on('submit', function() {
                 Swal.fire({
                     title: 'Procesando...',
                     text: 'Por favor espera un momento',
@@ -381,13 +489,6 @@ $res = $conn->query("SELECT * FROM escuela ORDER BY nombre_escuela ASC");
                     didOpen: () => {
                         Swal.showLoading()
                     }
-                });
-            });
-
-            $("#buscador").on("keyup", function() {
-                var value = $(this).val().toLowerCase();
-                $("#tablaEscuelas tbody tr").filter(function() {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
             });
         });
