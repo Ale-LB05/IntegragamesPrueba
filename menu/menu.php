@@ -280,7 +280,7 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                                 <div class="card hover-lift h-100 text-center">
                                     <div class="card-body p-4">
                                         <div class="mb-3">
-                                            <img src="<?php echo $juego['imagen']; ?>" class="img-fluid rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover; border: 4px solid #fff;">
+                                            <img src="<?php echo $juego['imagen']; ?>" class="img-fluid shadow-sm" style="width: 100%; height: 180px; object-fit: cover; border-radius: 15px; border: 4px solid #fff;">
                                         </div>
                                         <h4 class="font-weight-bold text-dark"><?php echo $juego['nombre']; ?></h4>
                                         <p class="text-muted small mb-4">

@@ -50,8 +50,8 @@ if (!isset($_SESSION['id_responsable'])) {
 
                     <p>Bienvenido <b><?php echo $_SESSION['nombre']; ?></b></p>
 
-                    <a href="../index.php" class="btn btn-secondary btn-sm">
-                        Volver al inicio
+                    <a href="../index.php" class="back-link text-decoration-none">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Volver al inicio
                     </a>
 
                 </div>

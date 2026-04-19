@@ -3,7 +3,7 @@ session_start();
 session_destroy();
 require_once "../config/conexion.php";
 $escuelas = $conn->query("SELECT * FROM escuela");
-// Consulta filtrada: Solo eventos con la fecha de HOY [cite: 2572]
+// Consulta filtrada: Solo eventos con la fecha de HOY
 $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
 ?>
 
@@ -19,6 +19,9 @@ $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
     <style>
         :root {
@@ -59,7 +62,6 @@ $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
             transition: box-shadow 0.3s ease, border-color 0.3s ease;
         }
 
-        /* Efecto de sombra profesional sin "brincos" */
         .card:hover {
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25) !important;
             border-color: var(--accent-color);
@@ -99,6 +101,27 @@ $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
         .input-group:focus-within .form-control,
         .input-group:focus-within .form-select {
             border-color: var(--accent-color);
+        }
+
+        /* CORRECCIÓN PARA MANTENER SELECT2 EN LA MISMA LÍNEA */
+        .input-group > .select2-container {
+            flex: 1 1 auto;
+            width: 1% !important;
+        }
+
+        .select2-container--bootstrap-5 .select2-selection {
+            border-left: none !important;
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            min-height: calc(1.5em + 1rem + 2px);
+            padding-top: 5px;
+            padding-bottom: 5px;
+            border-color: #dee2e6;
+        }
+
+        .input-group:focus-within .select2-container--bootstrap-5 .select2-selection {
+            border-color: var(--accent-color) !important;
+            box-shadow: none !important;
         }
 
         .btn-primary {
@@ -155,7 +178,7 @@ $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
                                 <label class="form-label fw-bold">Edad</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-calendar-day"></i></span>
-                                    <input type="number" class="form-control" name="edad" placeholder="¿Cuántos años tienes?" required>
+                                    <input type="number" class="form-control" name="edad" placeholder="¿Cuántos años tienes?" min="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" required>
                                 </div>
                             </div>
 
@@ -163,8 +186,8 @@ $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
                                 <label class="form-label fw-bold">Escuela de Procedencia</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-school"></i></span>
-                                    <select class="form-select" name="id_escuela" required>
-                                        <option value="">Selecciona tu escuela</option>
+                                    <select class="form-select" name="id_escuela" id="selectEscuela" required>
+                                        <option value="">Buscar escuela...</option>
                                         <?php while ($escuela = $escuelas->fetch_assoc()) { ?>
                                             <option value="<?php echo $escuela['id_escuela']; ?>">
                                                 <?php echo $escuela['nombre_escuela']; ?>
@@ -210,6 +233,27 @@ $eventos = $conn->query("SELECT * FROM evento WHERE fecha = CURDATE()");
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#selectEscuela').select2({
+                theme: 'bootstrap-5', 
+                placeholder: "Buscar escuela...",
+                width: '100%',
+                language: {
+                    noResults: function() {
+                        return "No se encontró ninguna escuela";
+                    }
+                }
+            }).on('select2:open', function () {
+                // Esto pone el texto gris de pista dentro del buscador de texto cuando haces clic
+                document.querySelector('.select2-search__field').placeholder = 'Buscar escuela...';
+            });
+        });
+    </script>
 </body>
 
 </html>

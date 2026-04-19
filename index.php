@@ -6,15 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IntegraGames - Inicio</title>
 
-    <!-- ICONO -->
-    <link rel="icon" href="../img/logo.png" type="image/png">
-    <!-- Bootstrap 5 CSS -->
+    <link rel="icon" href="img/logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 
-    <!-- FontAwesome para Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -30,7 +26,7 @@
         }
 
         .overlay {
-            position: absolute;
+            position: fixed; /* Cambiado a fixed para que cubra todo al hacer scroll */
             top: 0;
             left: 0;
             width: 100%;
@@ -44,6 +40,7 @@
             padding: 40px 20px;
             max-width: 800px;
             width: 100%;
+            z-index: 1; /* Asegura que esté por encima del overlay */
         }
 
         .logo-container {
@@ -91,12 +88,14 @@
             border-radius: 15px;
             padding: 25px;
             transition: all 0.3s ease;
+            cursor: pointer; /* Cambia el cursor a una mano */
         }
 
         .feature-item:hover {
             background: rgba(0, 210, 255, 0.1);
             border-color: #00d2ff;
             transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
         }
 
         .feature-icon {
@@ -144,6 +143,7 @@
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(0, 210, 255, 0.5);
+            color: white;
         }
 
         .btn2 {
@@ -176,65 +176,9 @@
         }
 
         .social-links a:hover {
-            color: #00d2ff;
+            color: #ffffff;
             transform: scale(1.2);
-        }
-
-        /* Animaciones */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-title {
-                font-size: 2.5rem;
-            }
-
-            .subtitle {
-                font-size: 1.1rem;
-            }
-
-            .logo-icon {
-                font-size: 3.5rem;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.8);
         }
 
         /* Contenedor de logos superiores */
@@ -246,13 +190,11 @@
             display: flex;
             justify-content: space-between;
             padding: 0 40px;
-            /* Espacio desde las orillas */
             z-index: 10;
         }
 
         .logo-superior {
             height: 60px;
-            /* Ajusta el tamaño según necesites */
             width: auto;
             filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
             transition: transform 0.3s ease;
@@ -262,15 +204,52 @@
             transform: scale(1.05);
         }
 
-        /* Ajuste para móviles */
-        @media (max-width: 768px) {
-            .logo-superior {
-                height: 40px;
-            }
+        /* Estilos del Modal Oscuro */
+        .modal-content.dark-theme {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
 
-            .top-logos {
-                padding: 0 15px;
-            }
+        .modal-header.dark-theme {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer.dark-theme {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        /* Animaciones */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; }
+            .subtitle { font-size: 1.1rem; }
+            .logo-icon { font-size: 3.5rem; }
+            .btn { width: 100%; justify-content: center; }
+            .logo-superior { height: 40px; }
+            .top-logos { padding: 0 15px; }
         }
     </style>
 </head>
@@ -278,78 +257,155 @@
 
 <body>
     <div class="overlay"></div>
+
+    <div class="top-logos">
+        <img src="img/logoUtm.png" alt="Logo UTM" class="logo-superior" style="height: 70px;">
+    </div>
+
     <div class="main-container">
 
-        <div class="top-logos">
-            <img src="img/logoUtm.png" alt="Logo UTM" class="logo-superior" style="height: 70px;">
-        </div>
-
-        <!-- Logo y Título -->
         <div class="logo-container">
             <div class="logo-icon">
-                <img src="img/logo.png" class="img-logo-main" style="height: 170px;">
+                <img src="img/logo.png" class="img-logo-main" style="height: 170px;" alt="Logo IntegraGames">
             </div>
             <h1 class="main-title">IntegraGames</h1>
             <p class="subtitle">La integración de la carrera a través del juego</p>
         </div>
 
-        <!-- Características -->
         <div class="features">
-            <div class="feature-item">
+            <div class="feature-item" onclick="abrirModal('eventos')">
                 <div class="feature-icon">
                     <i class="fa-solid fa-trophy"></i>
                 </div>
                 <div class="feature-title">Eventos</div>
-                <div class="feature-desc">Prueba un videojuegos exclusivos de TI</div>
+                <div class="feature-desc">Prueba videojuegos exclusivos de TI</div>
+                <span class="badge rounded-pill bg-primary mt-2 opacity-75" style="font-size: 0.7rem;">Saber más <i class="fas fa-arrow-right ms-1"></i></span>
             </div>
 
-            <div class="feature-item">
+            <div class="feature-item" onclick="abrirModal('comunidad')">
                 <div class="feature-icon">
                     <i class="fa-solid fa-users"></i>
                 </div>
                 <div class="feature-title">Comunidad</div>
                 <div class="feature-desc">Conoce a nuestros integrantes de la carrera</div>
+                <span class="badge rounded-pill bg-primary mt-2 opacity-75" style="font-size: 0.7rem;">Saber más <i class="fas fa-arrow-right ms-1"></i></span>
             </div>
 
-            <div class="feature-item">
+            <div class="feature-item" onclick="abrirModal('juegos')">
                 <div class="feature-icon">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <div class="feature-title">Juegos</div>
-                <div class="feature-desc">Juegos entretenidos</div>
+                <div class="feature-desc">Descubre la tecnología detrás de ellos</div>
+                <span class="badge rounded-pill bg-primary mt-2 opacity-75" style="font-size: 0.7rem;">Saber más <i class="fas fa-arrow-right ms-1"></i></span>
             </div>
         </div>
 
-        <!-- Botones de Acción -->
         <div class="btn-container">
             <a href="registroAlumnos/registro_alumno.php" class="btn">
-                <i class="fa-solid fa-user-plus"></i>
-                Registrarme
+                <i class="fa-solid fa-user-plus"></i> Registrarme
             </a>
 
             <a href="RegistroAdmin/login.php" class="btn btn2">
-                <i class="fa-solid fa-right-to-bracket"></i>
-                Encargado
+                <i class="fa-solid fa-right-to-bracket"></i> Encargado
             </a>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             <p>&copy; <?php echo date('Y'); ?> IntegraGames. Todos los derechos reservados.</p>
-            <p>Desarrollado por alumnos de la Universidad Tecnologica de Morelia de la
-                carrera TI</p>
+            <p>Desarrollado por alumnos de la Universidad Tecnológica de Morelia de la carrera TI</p>
 
             <div class="social-links">
-                <a href="https://www.facebook.com/share/1CTdx2LSvG/" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://www.instagram.com/utmmorelia?igsh=NzBsNHVlYTRyeTZk" title="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.tiktok.com/@utmorelia?_r=1&_t=ZS-94h24oJcmpk" title="Tiktok"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.facebook.com/share/1CTdx2LSvG/" title="Facebook" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/utmmorelia?igsh=NzBsNHVlYTRyeTZk" title="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@utmorelia?_r=1&_t=ZS-94h24oJcmpk" title="Tiktok" target="_blank"><i class="fab fa-tiktok"></i></a>
             </div>
         </div>
 
     </div>
 
-    <!-- Bootstrap JS -->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content dark-theme">
+                <div class="modal-header dark-theme">
+                    <h5 class="modal-title fw-bold" id="infoModalLabel">
+                        <i id="modalIcon" class="me-2" style="color: #00d2ff;"></i>
+                        <span id="modalTitle">Título</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    </div>
+                <div class="modal-footer dark-theme border-0 justify-content-center">
+                    <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">Entendido</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const informacion = {
+            'eventos': {
+                titulo: 'Acerca de los Eventos',
+                icono: 'fa-solid fa-trophy',
+                contenido: `
+                    <p class="mb-3 text-light opacity-75">Nuestros eventos están diseñados para poner a prueba tus habilidades de lógica y programación mediante juegos competitivos y colaborativos.</p>
+                    <h6 class="fw-bold" style="color: #00d2ff;">Lo que encontrarás:</h6>
+                    <ul class="text-start text-light opacity-75">
+                        <li>Torneos exclusivos para alumnos y visitantes.</li>
+                        <li>Retos de programación contrarreloj.</li>
+                        <li>Exhibición de proyectos finales de la carrera de TI.</li>
+                    </ul>
+                `
+            },
+            'comunidad': {
+                titulo: 'Nuestra Comunidad',
+                icono: 'fa-solid fa-users',
+                contenido: `
+                    <p class="mb-3 text-light opacity-75">IntegraGames fue desarrollado orgullosamente por alumnos de la Universidad Tecnológica de Morelia (UTM).</p>
+                    <h6 class="fw-bold" style="color: #00d2ff;">Tecnologías utilizadas:</h6>
+                    <div class="d-flex justify-content-center gap-3 mt-3 fs-3">
+                        <i class="fab fa-html5" title="HTML5" style="color: #E34F26;"></i>
+                        <i class="fab fa-css3-alt" title="CSS3" style="color: #1572B6;"></i>
+                        <i class="fab fa-js" title="JavaScript" style="color: #F7DF1E;"></i>
+                        <i class="fab fa-php" title="PHP" style="color: #777BB4;"></i>
+                        <i class="fas fa-database" title="MySQL" style="color: #4479A1;"></i>
+                        <i class="fab fa-bootstrap" title="Bootstrap" style="color: #7952B3;"></i>
+                    </div>
+                    <p class="mt-4 mb-0 small opacity-50">Trabajamos bajo metodologías ágiles (Scrum) para garantizar la calidad de la plataforma.</p>
+                `
+            },
+            'juegos': {
+                titulo: 'Nuestros Juegos',
+                icono: 'fa-solid fa-shield-halved',
+                contenido: `
+                    <p class="mb-3 text-light opacity-75">En la Zona Arcade encontrarás juegos desarrollados para enseñar conceptos fundamentales de programación de forma divertida.</p>
+                    <h6 class="fw-bold" style="color: #00d2ff;">Catálogo actual:</h6>
+                    <div class="text-start mt-3">
+                        <div class="mb-2"><i class="fas fa-check-circle me-2 text-success"></i> <strong>Error 404:</strong> Juego de agilidad mental.</div>
+                        <div class="mb-2"><i class="fas fa-check-circle me-2 text-success"></i> <strong>Code Run:</strong> Esquiva bugs y compila código.</div>
+                        <div class="mb-2"><i class="fas fa-check-circle me-2 text-success"></i> <strong>DesafioTech:</strong> Preguntas y respuestas de TI.</div>
+                    </div>
+                `
+            }
+        };
+
+        function abrirModal(seccion) {
+            // Obtenemos los datos según la sección que presionó el usuario
+            const datos = informacion[seccion];
+
+            // Inyectamos los datos en el modal
+            document.getElementById('modalTitle').innerText = datos.titulo;
+            document.getElementById('modalIcon').className = datos.icono + " me-2";
+            document.getElementById('modalBody').innerHTML = datos.contenido;
+
+            // Mostramos el modal usando Bootstrap
+            const modal = new bootstrap.Modal(document.getElementById('infoModal'));
+            modal.show();
+        }
+    </script>
 </body>
 
 </html>

@@ -214,7 +214,7 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
 
                     <h4 class="mb-3 fw-bold text-gray-800"><i class="fas fa-calendar-check mr-2" style="color: #4e73df;"></i> Mis Eventos Asignados</h4>
                     <?php
-                    // CONSULTA MEJORADA: Solo trae eventos donde id_responsable sea el del usuario actual
+                    // CONSULTA MODIFICADA: Se quitó 'hora' y ahora trae todas las columnas de 'evento' incluyendo hora_inicio y hora_fin
                     $sqlEventos = "SELECT e.* FROM evento e 
                                    INNER JOIN evento_responsable er ON e.id_evento = er.id_evento 
                                    WHERE er.id_responsable = '$id_responsable_actual' 
@@ -243,7 +243,14 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
                                     </div>
                                     <small class="text-muted d-block mt-1">
                                         <i class="fas fa-calendar-day mr-1" style="color: #4e73df;"></i> <?= date("d/m/Y", strtotime($row["fecha"])) ?> &nbsp;|&nbsp;
-                                        <i class="fas fa-clock mr-1" style="color: #4e73df;"></i> <?= date("h:i A", strtotime($row["hora"])) ?>
+                                        <i class="fas fa-clock mr-1" style="color: #4e73df;"></i> 
+                                        <?php 
+                                            if(!empty($row["hora_inicio"]) && !empty($row["hora_fin"])){
+                                                echo date("h:i A", strtotime($row["hora_inicio"])) . " - " . date("h:i A", strtotime($row["hora_fin"])); 
+                                            } else {
+                                                echo "Horario no definido";
+                                            }
+                                        ?>
                                     </small>
                                     <small class="text-muted d-block mt-1">
                                         <i class="fas fa-map-marker-alt mr-1" style="color: #e74a3b;"></i> <?= htmlspecialchars($row["lugar"]) ?>
@@ -266,6 +273,7 @@ $imagen = (!empty($user['imagen']) && file_exists("../img/responsables/" . $user
             <?php include("../menu/php/piePagina.php"); ?>
         </div>
     </div>
+
     <div class="modal fade" id="modalNombre" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <form method="POST" action="php/actualizar_perfil.php" class="modal-content shadow-lg border-0 rounded-4">
