@@ -354,8 +354,8 @@
                     <p class="mb-3 text-light opacity-75">Nuestros eventos están diseñados para poner a prueba tus habilidades de lógica y programación mediante juegos competitivos y colaborativos.</p>
                     <h6 class="fw-bold" style="color: #00d2ff;">Lo que encontrarás:</h6>
                     <ul class="text-start text-light opacity-75">
-                        <li>Torneos exclusivos para alumnos y visitantes.</li>
-                        <li>Retos de programación contrarreloj.</li>
+                        <li>Eventos exclusivos para alumnos y visitantes.</li>
+                        <li>Retos de sabidria .</li>
                         <li>Exhibición de proyectos finales de la carrera de TI.</li>
                     </ul>
                 `

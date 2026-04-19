@@ -25,8 +25,14 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
         body {
             background: #eef4ff;
         }
-        .text-primary { color: #4e73df !important; }
-        .text-secondary { color: #858796 !important; }
+
+        .text-primary {
+            color: #4e73df !important;
+        }
+
+        .text-secondary {
+            color: #858796 !important;
+        }
 
         .rounded-4 {
             border-radius: 1rem !important;
@@ -198,7 +204,7 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                                       </div>";
                             }
 
-                        /* PARTICIPANTE - VE TARJETAS INFORMATIVAS */
+                            /* PARTICIPANTE - VE TARJETAS INFORMATIVAS */
                         } else {
                             $juegosInfo = [
                                 [
@@ -254,21 +260,21 @@ $rolesPermitidos = ['administrador', 'programador', 'promotor'];
                             [
                                 "nombre" => "Error 404",
                                 "imagen" => "../img/uno/uno.png",
-                                "descripcion" => "Juego de cartas competitivo para mentes ágiles.",
+                                "descripcion" => "El clásico juego de cartas reinventado. Aplica tu agilidad mental para dejar a tus oponentes sin conexión.",
                                 "link" => "../juegos/error404.php",
                                 "color" => "info"
                             ],
                             [
                                 "nombre" => "Code Run",
                                 "imagen" => "../img/codeRun/runCode.png",
-                                "descripcion" => "Evita enemigos y supera niveles programando tus pasos.",
+                                "descripcion" => "Supera niveles en este mundo pixelado. Esquiva amenazas digitales mientras compilas tu camino al éxito.",
                                 "link" => "../juegos/codeRun.php",
                                 "color" => "info"
                             ],
                             [
-                                "nombre" => "DesafioTech",
+                                "nombre" => "Desafío Tech",
                                 "imagen" => "../img/desafioTech/desafioTech.png",
-                                "descripcion" => "Aprende las reglas básicas y diviértete compitiendo.",
+                                "descripcion" => "Supera las preguntas del Maestro Byte. Una trivia llena de ritmo, comodines y aprendizaje tecnológico.",
                                 "link" => "../juegos/desafioTech.php",
                                 "color" => "info"
                             ]

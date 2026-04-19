@@ -100,11 +100,12 @@ $rol = $_SESSION['rol'];
                             "../img/uno/uno.3.png",
                             "../img/uno/uno.4.png"
                         ],
+                        "parrafo" => "Error404 transforma la diversión de UNO en una experiencia educativa sobre la carrera de Tecnologías de la Información. Cada partida te reta a pensar, adaptarte y aprender conceptos clave de programación, bases de datos, redes, ciberseguridad y soporte técnico mediante cartas temáticas, efectos especiales y mensajes contextuales. No solo juegas para ganar: juegas para descubrir cómo funciona el mundo de TI.",
                         "descripcion" => [
-                            "Error 404 es un juego de cartas.",
-                            "Debes ganar cada partida.",
-                            "Pon a prueba tu lógica.",
-                            "Ideal para aprender jugando."
+                            "Basado en las divertidas reglas clásicas de UNO.",
+                            "Cartas temáticas con conceptos clave de TI.",
+                            "Mecánicas con efectos especiales y mensajes contextuales.",
+                            "Pon a prueba tu lógica y capacidad de adaptación."
                         ],
                         "link" => "../juegos/error404/index.html"
                     ];
@@ -159,10 +160,14 @@ $rol = $_SESSION['rol'];
 
                                         <h1 class="game-title mb-3"><?php echo $juego['nombre']; ?></h1>
 
+                                        <p class="text-secondary mb-4" style="font-size: 0.95rem; line-height: 1.6; text-align: justify;">
+                                            <?php echo $juego['parrafo']; ?>
+                                        </p>
+
                                         <div class="mb-4">
                                             <?php foreach ($juego['descripcion'] as $linea) { ?>
                                                 <p class="text-muted mb-2" style="line-height: 1.7; font-size: 1.05rem;">
-                                                    <i class="fas fa-check-circle text-success mr-2" style="font-size: 0.8rem;"></i> <?php echo $linea; ?>
+                                                    <i class="fas fa-check-circle text-success mr-2" style="font-size: 0.9rem;"></i> <?php echo $linea; ?>
                                                 </p>
                                             <?php } ?>
                                         </div>
@@ -199,10 +204,10 @@ $rol = $_SESSION['rol'];
 
     <?php include("../menu/php/logoutModal.php"); ?>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
+    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../js/sb-admin-2.min.js"></script>
 
 </body>
 

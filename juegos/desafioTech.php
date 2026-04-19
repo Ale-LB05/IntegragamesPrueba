@@ -41,7 +41,7 @@ $rol = $_SESSION['rol'];
         .carousel-inner {
             border-radius: 1rem;
             background-color: #1a1c23;
-            /* Fondo oscuro para resaltar las cartas */
+            /* Fondo oscuro para resaltar las capturas */
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -103,18 +103,19 @@ $rol = $_SESSION['rol'];
 
                     <?php
                     $juego = [
-                        "nombre" => "DesafioTech",
+                        "nombre" => "Desafío Tech",
                         "imagenes" => [
                             "../img/desafioTech/desafioTech.png",
                             "../img/desafioTech/desafioTech.2.png",
                             "../img/desafioTech/desafioTech.3.png",
                             "../img/desafioTech/desafioTech.4.png"
                         ],
+                        "parrafo" => "Desafío Tech es una experiencia interactiva que convierte el conocimiento en tecnología en un reto emocionante. A través de una dinámica llena de ritmo, los jugadores ponen a prueba sus habilidades en temas clave de TI mientras se divierten. ¡Descubre todo el potencial que existe en el mundo tecnológico!",
                         "descripcion" => [
-                            "Error 404 es un juego de cartas.",
-                            "Debes ganar cada partida.",
-                            "Pon a prueba tu lógica.",
-                            "Ideal para aprender jugando."
+                            "Preguntas de distintos niveles, comodines y potenciadores.",
+                            "Compite y aprende con la guía de Maestro Byte.",
+                            "Acércate a la carrera de TI de forma entretenida.",
+                            "Despierta tu interés por la innovación."
                         ],
                         "link" => "../juegos/desafioTech/index.html"
                     ];
@@ -163,16 +164,20 @@ $rol = $_SESSION['rol'];
                                     <div class="col-lg-5 pl-lg-5 d-flex flex-column justify-content-center">
 
                                         <div class="mb-3">
-                                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill shadow-sm"><i class="fas fa-layer-group mr-1"></i> Cartas</span>
-                                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm"><i class="fas fa-brain mr-1"></i> Estrategia</span>
+                                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill shadow-sm"><i class="fas fa-question-circle mr-1"></i> Trivia</span>
+                                            <span class="badge bg-light text-dark border px-3 py-2 rounded-pill shadow-sm"><i class="fas fa-laptop-code mr-1"></i> TI & Aprendizaje</span>
                                         </div>
 
                                         <h1 class="game-title mb-3"><?php echo $juego['nombre']; ?></h1>
 
+                                        <p class="text-secondary mb-4" style="font-size: 0.95rem; line-height: 1.6; text-align: justify;">
+                                            <?php echo $juego['parrafo']; ?>
+                                        </p>
+
                                         <div class="mb-4">
                                             <?php foreach ($juego['descripcion'] as $linea) { ?>
-                                                <p class="text-muted mb-2" style="line-height: 1.7; font-size: 1.05rem;">
-                                                    <i class="fas fa-check-circle text-success mr-2" style="font-size: 0.8rem;"></i> <?php echo $linea; ?>
+                                                <p class="text-muted mb-2" style="line-height: 1.7; font-size: 1.0rem;">
+                                                    <i class="fas fa-check-circle text-success mr-2" style="font-size: 0.9rem;"></i> <?php echo $linea; ?>
                                                 </p>
                                             <?php } ?>
                                         </div>
@@ -209,10 +214,10 @@ $rol = $_SESSION['rol'];
 
     <?php include("../menu/php/logoutModal.php"); ?>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/startbootstrap-sb-admin-2@4.1.4/js/sb-admin-2.min.js"></script>
+    <script src="../vendor/jquery/jquery.min.js"></script>
+    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../js/sb-admin-2.min.js"></script>
 
 </body>
 
